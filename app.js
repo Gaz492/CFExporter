@@ -276,7 +276,7 @@ function createExport() {
         })
     });
     fileToCopy.then(() => {
-        // compress()
+        compress()
     })
 }
 
