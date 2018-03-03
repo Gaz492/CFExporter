@@ -139,11 +139,18 @@ function run() {
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
+        .option('-n, --name <packName>', 'Export Name')
+        .option('-mv, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
+        .option('-pv, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
+        .option('-a, --author <author>', 'Author of pack')
+        .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
         .parse(process.argv);
 
-    list(program.include).forEach(item => {
-        copyList.push(item)
-    });
+    if(program.include){
+        list(program.include).forEach(item => {
+            copyList.push(item)
+        });
+    }
 
     if (program.dir) {
         inquirer.prompt(questions).then(answers => {
