@@ -6,7 +6,8 @@
   "author": "Gareth Williams <gaz492@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "build": "nexe -i app.js -o ./build/twitch-export -b"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
