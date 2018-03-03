@@ -80,7 +80,6 @@ if (!fs.existsSync('meta')) {
 checkMeta();
 
 function checkMeta() {
-
     if (fs.existsSync('./meta/curse.json')) {
         fs.createReadStream('./meta/curse.json').pipe(crypto.createHash('md5').setEncoding('hex')).on('finish', function () {
             let jsonHash = this.read();
@@ -179,37 +178,8 @@ function getProjectID() {
                 projectObj.push({projectID: project[1]['project'], fileID: project[1]['id'], required: true})
             }
         })
-    })
+    });
     createExport();
-
-    // let projectIds = Object.keys(curseJson[0]);
-    // console.log(Object.entries(curseJson[0]))
-
-    // projectIds.forEach((id) => {
-    //     console.log(id, curseJson[0][id].Name)
-    // })
-
-    // for (let i = 0; i < projectIds.length; i++){
-    //     console.log(curseJson.projectIds[i])
-    // }
-    // console.log(curseJson.length)
-    // for (let i = 0; i < curseJson.length; i++) {
-    //     for(let x = 0; x < Object.keys(curseJson[i]); x++){
-    //         console.log(Object.keys(curseJson[i])[x])
-    //     }
-    //     // look for the entry with a matching `code` value
-    //     // for (let x = 0; x < curseJson[i]['GameVersionLatestFiles'].length; x++) {
-    //     //     modList.forEach(mod => {
-    //     //         // if (curseJson[i]['GameVersionLatestFiles'][x].ProjectFileName === mod) {
-    //     //         //     console.log(curseJson[i].Id, curseJson[i]['GameVersionLatestFiles'][x].ProjectFileName, mod,)
-    //     //         // }
-    //     //     });
-    //     //     // if (curseJson['Data'][i].code == needle){
-    //     //     //     // we found it
-    //     //     //     // obj[i].name is the matched result
-    //     //     // }
-    //     // }
-    // }
 }
 
 function createExport() {
