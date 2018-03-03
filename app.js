@@ -5,6 +5,8 @@ const path = require('path');
 const request = require('request');
 const crypto = require('crypto');
 const AdmZip = require('adm-zip');
+const rimraf = require('rimraf');
+const ncp = require('ncp');
 
 const questions = [
     {
@@ -71,10 +73,18 @@ let mcVersion;
 let forgeVersion;
 let projectObj = [];
 let modList = [];
+let foundMods = [];
+let copyList = ['config'];
 let curseJson;
 
 if (!fs.existsSync('meta')) {
     fs.mkdirSync('meta')
+}
+
+if(fs.existsSync('export')){
+    rimraf('./export', (err) =>{
+        if(err) return console.log(err);
+    })
 }
 
 checkMeta();
@@ -127,8 +137,12 @@ function run() {
         .version('1.0.0', '-v, --version')
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
-        .option('-i, --include <directory/file names>', list)
+        .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
         .parse(process.argv);
+
+    list(program.include).forEach(item => {
+        copyList.push(item)
+    });
 
     if (program.dir) {
         inquirer.prompt(questions).then(answers => {
@@ -176,15 +190,30 @@ function getProjectID() {
         Object.entries(curseJson['files']).forEach(project => {
             if (project[1]['filename'] === mod) {
                 projectObj.push({projectID: project[1]['project'], fileID: project[1]['id'], required: true})
+                foundMods.push(mod);
             }
         })
     });
+
     createExport();
+}
+
+function copyItems(folder){
+    ncp(path.join(program.dir, folder), './export/overrides/' + folder, (err) =>{
+        if(err) return console.log('An error occurred during copying: ' + folder, err);
+        return console.log('Copied:', folder)
+    })
 }
 
 function createExport() {
     if (!fs.existsSync('export')) {
         fs.mkdirSync('export')
+    }
+    if (!fs.existsSync('export/overrides')) {
+        fs.mkdirSync('export/overrides')
+    }
+    if (!fs.existsSync('export/overrides/mods')) {
+        fs.mkdirSync('export/overrides/mods')
     }
 
     let manifest = {
@@ -192,7 +221,7 @@ function createExport() {
             version: mcVersion,
             modLoaders: [
                 {
-                    id: 'forge-' + mcVersion + '-' + forgeVersion,
+                    id: 'forge-' + forgeVersion,
                     primary: true
                 }
             ],
@@ -209,6 +238,22 @@ function createExport() {
         if (err) {
             return console.log(err);
         }
-        console.log("The file was saved!");
+        console.log("manifest.json created");
     });
+    let checkDiff = modList.filter(function (n) {
+        return !this.has(n)
+    }, new Set(foundMods));
+
+    checkDiff.forEach(mod => {
+        fs.copyFile(path.join(program.dir, 'mods', mod), './export/overrides/mods/' + mod, (err) =>{
+            if(err){
+                console.log('An error occurred during file copying', err);
+            }
+        })
+    });
+    console.log(copyList);
+    copyList.forEach(item =>{
+        copyItems(item)
+    })
+
 }

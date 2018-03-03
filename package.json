@@ -14,7 +14,10 @@
     "async": "^2.6.0",
     "commander": "^2.14.1",
     "crypto": "^1.0.1",
+    "fs-extra": "^5.0.0",
     "inquirer": "^5.1.0",
-    "request": "^2.83.0"
+    "ncp": "^2.0.0",
+    "request": "^2.83.0",
+    "rimraf": "^2.6.2"
   }
 }
