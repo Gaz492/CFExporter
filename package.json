@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "archiver": "^2.1.1",
     "async": "^2.6.0",
     "commander": "^2.14.1",
     "crypto": "^1.0.1",

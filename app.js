@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const AdmZip = require('adm-zip');
 const rimraf = require('rimraf');
 const ncp = require('ncp');
+const archiver = require('archiver');
 
 const questions = [
     {
@@ -81,9 +82,9 @@ if (!fs.existsSync('meta')) {
     fs.mkdirSync('meta')
 }
 
-if(fs.existsSync('export')){
-    rimraf('./export', (err) =>{
-        if(err) return console.log(err);
+if (fs.existsSync('export')) {
+    rimraf('./export', (err) => {
+        if (err) return console.log(err);
     })
 }
 
@@ -189,20 +190,26 @@ function getProjectID() {
     modList.forEach(mod => {
         Object.entries(curseJson['files']).forEach(project => {
             if (project[1]['filename'] === mod) {
-                projectObj.push({projectID: project[1]['project'], fileID: project[1]['id'], required: true})
-                foundMods.push(mod);
+                if (project[1]['minecraft'].find(mcVer => {
+                        if (mcVer === mcVersion) {
+                            projectObj.push({
+                                projectID: project[1]['project'],
+                                fileID: project[1]['id'],
+                                filename: project[1]['filename'],
+                                required: true
+                            });
+                            foundMods.push(mod);
+                        }else{
+                            console.log(mod)
+                        }
+                    })) {
+                }
+
             }
         })
     });
 
     createExport();
-}
-
-function copyItems(folder){
-    ncp(path.join(program.dir, folder), './export/overrides/' + folder, (err) =>{
-        if(err) return console.log('An error occurred during copying: ' + folder, err);
-        return console.log('Copied:', folder)
-    })
 }
 
 function createExport() {
@@ -245,15 +252,55 @@ function createExport() {
     }, new Set(foundMods));
 
     checkDiff.forEach(mod => {
-        fs.copyFile(path.join(program.dir, 'mods', mod), './export/overrides/mods/' + mod, (err) =>{
-            if(err){
-                console.log('An error occurred during file copying', err);
-            }
+        fs.copyFile(path.join(program.dir, 'mods', mod), './export/overrides/mods/' + mod, (err) => {
+            if (err) return console.log('An error occurred during file copying', err);
         })
     });
-    console.log(copyList);
-    copyList.forEach(item =>{
-        copyItems(item)
-    })
 
+    let fileToCopy = new Promise((resolve, reject) => {
+        let itemsCopied = 0;
+        copyList.forEach((item, index, array) => {
+            ncp(path.join(program.dir, item), './export/overrides/' + item, (err) => {
+                if (err) return console.log('An error occurred during copying: ' + item, err);
+                console.log('Copied:', item);
+                itemsCopied++;
+                if (itemsCopied === array.length) resolve();
+            });
+        })
+    });
+    fileToCopy.then(() => {
+        // compress()
+    })
+}
+
+function compress() {
+    console.log('Compressing Output');
+    let output = fs.createWriteStream(packName + '-' + packVersion + '.zip');
+    let archive = archiver('zip', {});
+
+    output.on('close', function () {
+        console.log(archive.pointer() + ' total bytes');
+        console.log('archiver has been finalized and the output file descriptor has closed.');
+        console.log(packName + '-' + packVersion + '.zip created')
+    });
+
+    output.on('end', function () {
+        console.log('Data has been drained');
+    });
+    archive.on('warning', function (err) {
+        if (err.code === 'ENOENT') {
+            // log warning
+        } else {
+            // throw error
+            throw err;
+        }
+    });
+    archive.on('error', function (err) {
+        throw err;
+    });
+
+    archive.pipe(output);
+
+    archive.directory('export', false);
+    archive.finalize();
 }
