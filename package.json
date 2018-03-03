@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
-    "build": "nexe -i app.js -o ./build/twitch-export -b"
+    "build": "pkg app.js -t node8-linux-x64,node8-macos-x64,node8-win-x64 -o build/twitch-exporter"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
