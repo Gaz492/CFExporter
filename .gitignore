@@ -1,0 +1,10 @@
+
+\.idea/
+
+node_modules/
+
+build/
+
+export/
+
+meta/

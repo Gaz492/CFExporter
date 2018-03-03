@@ -1,0 +1,20 @@
+{
+  "name": "twitch-export-builder",
+  "version": "1.0.0",
+  "main": "app.js",
+  "repository": "git@github.com:Gaz492/twitch-export-builder.git",
+  "author": "Gareth Williams <gaz492@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "async": "^2.6.0",
+    "commander": "^2.14.1",
+    "crypto": "^1.0.1",
+    "inquirer": "^5.1.0",
+    "request": "^2.83.0"
+  }
+}
