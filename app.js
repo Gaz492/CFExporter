@@ -206,12 +206,9 @@ function getProjectID() {
                                 required: true
                             });
                             foundMods.push(mod);
-                        }else{
-                            console.log(mod)
                         }
                     })) {
                 }
-
             }
         })
     });
