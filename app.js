@@ -88,52 +88,67 @@ if (fs.existsSync('export')) {
     })
 }
 
-checkMeta();
+// checkMeta();
+getCurseMeta();
 
-function checkMeta() {
-    if (fs.existsSync('./meta/curse.json')) {
-        fs.createReadStream('./meta/curse.json').pipe(crypto.createHash('md5').setEncoding('hex')).on('finish', function () {
-            let jsonHash = this.read();
-            request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.json.md5')
-                .pipe(fs.createWriteStream('./meta/curse.json.md5'))
-                .on('close', function () {
-                    fs.readFile('./meta/curse.json.md5', 'utf8', function (err, data) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        if (data.split('\n')[0] !== jsonHash) {
-                            request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.zip')
-                                .pipe(fs.createWriteStream('./meta/curse.zip'))
-                                .on('close', function () {
-                                    console.log('File written!');
-                                    let zip = new AdmZip("./meta/curse.zip");
-                                    zip.extractAllTo("./meta/", true);
-                                    run();
-                                });
-                        } else {
-                            run();
-                        }
-                    });
-                });
-        })
-    } else {
-        request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.zip')
-            .pipe(fs.createWriteStream('./meta/curse.zip'))
-            .on('close', function () {
-                console.log('File written!');
-                let zip = new AdmZip("./meta/curse.zip");
-                zip.extractAllTo("./meta/", true);
-                run();
-            });
-    }
+function getCurseMeta() {
+    let options = {
+        url: 'https://cursemeta.dries007.net/raw_mods.json',
+        method: 'GET',
+        json: true
+    };
+    request(options, function (error, response, body) {
+        if (error) console.log(error);
+
+        curseJson = body['Data'];
+        run()
+    });
 }
+
+// function checkMeta() {
+//     if (fs.existsSync('./meta/curse.json')) {
+//         fs.createReadStream('./meta/curse.json').pipe(crypto.createHash('md5').setEncoding('hex')).on('finish', function () {
+//             let jsonHash = this.read();
+//             request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.json.md5')
+//                 .pipe(fs.createWriteStream('./meta/curse.json.md5'))
+//                 .on('close', function () {
+//                     fs.readFile('./meta/curse.json.md5', 'utf8', function (err, data) {
+//                         if (err) {
+//                             console.log(err);
+//                         }
+//                         if (data.split('\n')[0] !== jsonHash) {
+//                             request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.zip')
+//                                 .pipe(fs.createWriteStream('./meta/curse.zip'))
+//                                 .on('close', function () {
+//                                     console.log('File written!');
+//                                     let zip = new AdmZip("./meta/curse.zip");
+//                                     zip.extractAllTo("./meta/", true);
+//                                     run();
+//                                 });
+//                         } else {
+//                             run();
+//                         }
+//                     });
+//                 });
+//         })
+//     } else {
+//         request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.zip')
+//             .pipe(fs.createWriteStream('./meta/curse.zip'))
+//             .on('close', function () {
+//                 console.log('File written!');
+//                 let zip = new AdmZip("./meta/curse.zip");
+//                 zip.extractAllTo("./meta/", true);
+//                 run();
+//             });
+//     }
+// }
 
 function list(val) {
     return val.split(',')
 }
 
 function run() {
-    curseJson = JSON.parse(fs.readFileSync('./meta/curse.json', 'utf8'));
+    // curseJson = JSON.parse(fs.readFileSync('./meta/curse.json', 'utf8'));
     program
         .version('1.0.0', '-v, --version')
         .usage('[options] <filepath>')
@@ -146,7 +161,7 @@ function run() {
         .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
         .parse(process.argv);
 
-    if(program.include){
+    if (program.include) {
         list(program.include).forEach(item => {
             copyList.push(item)
         });
@@ -193,25 +208,44 @@ function listMods(modsFolder) {
 }
 
 function getProjectID() {
-
+    let tmp = 0;
     modList.forEach(mod => {
-        Object.entries(curseJson['files']).forEach(project => {
-            if (project[1]['filename'] === mod) {
-                if (project[1]['minecraft'].find(mcVer => {
-                        if (mcVer === mcVersion) {
-                            projectObj.push({
-                                projectID: project[1]['project'],
-                                fileID: project[1]['id'],
-                                filename: project[1]['filename'],
-                                required: true
-                            });
-                            foundMods.push(mod);
-                        }
-                    })) {
+        Object.entries(curseJson).forEach(project => {
+            project[1]['GameVersionLatestFiles'].find(files => {
+                if (files['ProjectFileName'] === mod) {
+                    if (files['GameVesion'] >= mcVersion.split('.').slice(0, 2).join('.')) {
+                        projectObj.push({
+                            projectID: project[1]['Id'],
+                            fileID: files['ProjectFileID'],
+                            filename: files['ProjectFileName'],
+                            required: true
+                        });
+                        foundMods.push(mod);
+                        return true;
+                    }
                 }
-            }
-        })
+            })
+        });
     });
+
+    // modList.forEach(mod => {
+    //     Object.entries(curseJson['files']).forEach(project => {
+    //         if (project[1]['filename'] === mod) {
+    //             if (project[1]['minecraft'].find(mcVer => {
+    //                     if (mcVer === mcVersion) {
+    //                         projectObj.push({
+    //                             projectID: project[1]['project'],
+    //                             fileID: project[1]['id'],
+    //                             filename: project[1]['filename'],
+    //                             required: true
+    //                         });
+    //                         foundMods.push(mod);
+    //                     }
+    //                 })) {
+    //             }
+    //         }
+    //     })
+    // });
 
     createExport();
 }
