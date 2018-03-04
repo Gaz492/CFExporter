@@ -240,6 +240,7 @@ function getProjectID() {
     //                             required: true
     //                         });
     //                         foundMods.push(mod);
+    //                         return true;
     //                     }
     //                 })) {
     //             }
