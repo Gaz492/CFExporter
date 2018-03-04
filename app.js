@@ -8,6 +8,7 @@ const AdmZip = require('adm-zip');
 const rimraf = require('rimraf');
 const ncp = require('ncp');
 const archiver = require('archiver');
+const gunzip = require('gunzip-file');
 
 const questions = [
     {
@@ -92,73 +93,48 @@ if (fs.existsSync('export')) {
 getCurseMeta();
 
 function getCurseMeta() {
-    let options = {
-        url: 'https://cursemeta.dries007.net/raw_mods.json',
-        method: 'GET',
-        json: true
-    };
-    request(options, function (error, response, body) {
-        if (error) console.log(error);
+    // let options = {
+    //     url: 'https://cursemeta.dries007.net/raw_mods.json',
+    //     method: 'GET',
+    //     json: true
+    // };
+    // request(options, function (error, response, body) {
+    //     if (error) console.log(error);
+    //
+    //     curseJson = body['Data'];
+    //     run()
+    // });
 
-        curseJson = body['Data'];
-        run()
-    });
+    request('https://cursemeta.dries007.net/raw_mods.json.gz')
+        .pipe(fs.createWriteStream('./meta/raw_mods.json.gz'))
+        .on('close', function () {
+            console.log('File written!');
+            gunzip('./meta/raw_mods.json.gz', './meta/raw_mods.json', () =>{
+                console.log('JSON Archive extracted');
+                fs.readFile('./meta/raw_mods.json', 'utf8', (err, data) => {
+                    if(err) return console.log(err);
+                    curseJson = JSON.parse(data)['Data'];
+                    run();
+                });
+            });
+        });
 }
-
-// function checkMeta() {
-//     if (fs.existsSync('./meta/curse.json')) {
-//         fs.createReadStream('./meta/curse.json').pipe(crypto.createHash('md5').setEncoding('hex')).on('finish', function () {
-//             let jsonHash = this.read();
-//             request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.json.md5')
-//                 .pipe(fs.createWriteStream('./meta/curse.json.md5'))
-//                 .on('close', function () {
-//                     fs.readFile('./meta/curse.json.md5', 'utf8', function (err, data) {
-//                         if (err) {
-//                             console.log(err);
-//                         }
-//                         if (data.split('\n')[0] !== jsonHash) {
-//                             request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.zip')
-//                                 .pipe(fs.createWriteStream('./meta/curse.zip'))
-//                                 .on('close', function () {
-//                                     console.log('File written!');
-//                                     let zip = new AdmZip("./meta/curse.zip");
-//                                     zip.extractAllTo("./meta/", true);
-//                                     run();
-//                                 });
-//                         } else {
-//                             run();
-//                         }
-//                     });
-//                 });
-//         })
-//     } else {
-//         request('https://fdn.redstone.tech/theoneclient/hl3/onemeta/curse.zip')
-//             .pipe(fs.createWriteStream('./meta/curse.zip'))
-//             .on('close', function () {
-//                 console.log('File written!');
-//                 let zip = new AdmZip("./meta/curse.zip");
-//                 zip.extractAllTo("./meta/", true);
-//                 run();
-//             });
-//     }
-// }
 
 function list(val) {
     return val.split(',')
 }
 
 function run() {
-    // curseJson = JSON.parse(fs.readFileSync('./meta/curse.json', 'utf8'));
     program
         .version('1.0.0', '-v, --version')
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
-        .option('-n, --name <packName>', 'Export Name')
-        .option('-mv, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
-        .option('-pv, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
-        .option('-a, --author <author>', 'Author of pack')
-        .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
+        // .option('-n, --name <packName>', 'Export Name')
+        // .option('-mv, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
+        // .option('-pv, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
+        // .option('-a, --author <author>', 'Author of pack')
+        // .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
         .parse(process.argv);
 
     if (program.include) {
@@ -228,26 +204,6 @@ function getProjectID() {
         });
     });
 
-    // modList.forEach(mod => {
-    //     Object.entries(curseJson['files']).forEach(project => {
-    //         if (project[1]['filename'] === mod) {
-    //             if (project[1]['minecraft'].find(mcVer => {
-    //                     if (mcVer === mcVersion) {
-    //                         projectObj.push({
-    //                             projectID: project[1]['project'],
-    //                             fileID: project[1]['id'],
-    //                             filename: project[1]['filename'],
-    //                             required: true
-    //                         });
-    //                         foundMods.push(mod);
-    //                         return true;
-    //                     }
-    //                 })) {
-    //             }
-    //         }
-    //     })
-    // });
-
     createExport();
 }
 
@@ -315,7 +271,9 @@ function createExport() {
 function compress() {
     console.log('Compressing Output');
     let output = fs.createWriteStream(packName + '-' + packVersion + '.zip');
-    let archive = archiver('zip', {});
+    let archive = archiver('zip', {
+        zlib: { level: 9 }
+    });
 
     output.on('close', function () {
         console.log(archive.pointer() + ' total bytes');
@@ -339,7 +297,6 @@ function compress() {
     });
 
     archive.pipe(output);
-
     archive.directory('export', false);
     archive.finalize();
 }

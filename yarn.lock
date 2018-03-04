@@ -311,6 +311,10 @@ graceful-fs@^4.1.0, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
+gunzip-file@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/gunzip-file/-/gunzip-file-0.1.1.tgz#29b3a3cc8a6a58ce553812bc0b13f0a0bb3a5ee2"
+
 har-schema@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/har-schema/-/har-schema-2.0.0.tgz#a94c2224ebcac04782a0d9035521f24735b7ec92"
