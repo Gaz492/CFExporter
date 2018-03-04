@@ -10,3 +10,5 @@ export/
 meta/
 
 \.DS_Store
+
+*.zip
