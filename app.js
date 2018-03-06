@@ -62,10 +62,10 @@ function getCurseMeta() {
         .pipe(fs.createWriteStream('./meta/raw_mods.json.gz'))
         .on('close', function () {
             console.log('File written!');
-            gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () =>{
+            gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () => {
                 console.log('JSON Archive extracted');
                 fs.readFile(path.join(__dirname, directories.meta, 'raw_mods.json'), 'utf8', (err, data) => {
-                    if(err) return console.log(err);
+                    if (err) return console.log(err);
                     curseJson = JSON.parse(data)['Data'];
                     run();
                 });
@@ -95,15 +95,14 @@ function run() {
             copyList.push(item)
         });
     }
-
-    if(!program.packName){
+    if (!program.packName) {
         questions.push({
             type: 'input',
             name: 'packName',
             message: 'Please enter pack name'
         })
     }
-    if(!program.packVersion){
+    if (!program.packVersion) {
         questions.push({
             type: 'input',
             name: 'packVersion',
@@ -120,14 +119,14 @@ function run() {
             }
         })
     }
-    if(!program.author){
+    if (!program.author) {
         questions.push({
             type: 'input',
             name: 'packAuthor',
             message: 'Please enter pack author'
         })
     }
-    if(!program.mcVersion){
+    if (!program.mcVersion) {
         questions.push({
             type: 'input',
             name: 'mcVersion',
@@ -144,7 +143,7 @@ function run() {
             }
         })
     }
-    if(!program.forgeVersion){
+    if (!program.forgeVersion) {
         questions.push({
             type: 'input',
             name: 'forgeVersion',
@@ -260,6 +259,7 @@ function createExport() {
         }
         console.log("manifest.json created");
     });
+    
     let checkDiff = modList.filter(function (n) {
         return !this.has(n)
     }, new Set(foundMods));
@@ -290,7 +290,7 @@ function compress() {
     console.log('Compressing Output');
     let output = fs.createWriteStream(packName + '-' + packVersion + '.zip');
     let archive = archiver('zip', {
-        zlib: { level: 9 }
+        zlib: {level: 9}
     });
 
     output.on('close', function () {
