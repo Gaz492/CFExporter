@@ -57,7 +57,13 @@ function getCurseMeta() {
         fs.mkdirSync(path.join(__dirname, directories.meta))
     }
 
-    request('https://cursemeta.dries007.net/raw_mods.json.gz')
+    let options = {
+        url: 'https://cursemeta.dries007.net/raw_mods.json.gz',
+        headers: {
+            'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
+        }
+    };
+    request(options)
         .pipe(fs.createWriteStream(path.join(__dirname, directories.meta, 'raw_mods.json.gz')))
         .on('close', function () {
             console.log('File written!');
