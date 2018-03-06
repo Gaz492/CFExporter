@@ -3,12 +3,9 @@ const inquirer = require('inquirer');
 const fs = require('fs');
 const path = require('path');
 const request = require('request');
-const crypto = require('crypto');
-const AdmZip = require('adm-zip');
 const rimraf = require('rimraf');
 const ncp = require('ncp');
 const archiver = require('archiver');
-const gunzip = require('gunzip-file');
 
 const questions = [];
 const directories = {
