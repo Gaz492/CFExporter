@@ -13,7 +13,7 @@ const gunzip = require('gunzip-file');
 const questions = [];
 const directories = {
     export: {
-        root: 'export',
+        root: 'temp',
         overrides: 'overrides',
         mods: 'mods'
     },
@@ -32,10 +32,6 @@ let modList = [];
 let foundMods = [];
 let copyList = [];
 
-
-if (!fs.existsSync(path.join(__dirname, directories.meta))) {
-    fs.mkdirSync(path.join(__dirname, directories.meta))
-}
 
 if (fs.existsSync(path.join(__dirname, directories.export.root))) {
     rimraf(path.join(__dirname, directories.export.root), (err) => {
@@ -57,9 +53,12 @@ function getCurseMeta() {
     //     curseJson = body['Data'];
     //     run()
     // });
+    if (!fs.existsSync(path.join(__dirname, directories.meta))) {
+        fs.mkdirSync(path.join(__dirname, directories.meta))
+    }
 
     request('https://cursemeta.dries007.net/raw_mods.json.gz')
-        .pipe(fs.createWriteStream('./meta/raw_mods.json.gz'))
+        .pipe(fs.createWriteStream(path.join(__dirname, directories.meta, 'raw_mods.json.gz')))
         .on('close', function () {
             console.log('File written!');
             gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () => {
@@ -259,7 +258,7 @@ function createExport() {
         }
         console.log("manifest.json created");
     });
-    
+
     let checkDiff = modList.filter(function (n) {
         return !this.has(n)
     }, new Set(foundMods));
@@ -296,7 +295,11 @@ function compress() {
     output.on('close', function () {
         console.log(archive.pointer() + ' total bytes');
         console.log('archiver has been finalized and the output file descriptor has closed.');
-        console.log(packName + '-' + packVersion + '.zip created')
+        console.log(packName + '-' + packVersion + '.zip created');
+        rimraf(path.join(__dirname, directories.export.root), (err) => {
+            if (err) return console.log(err);
+            console.log('Cleaning up folders')
+        })
     });
 
     output.on('end', function () {
