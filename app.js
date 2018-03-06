@@ -288,15 +288,13 @@ function createExport() {
 function compress() {
     console.log('Creating Export...');
     let output = fs.createWriteStream(packName + '-' + packVersion + '.zip');
-    let archive = archiver('zip', {
-        zlib: {level: 9}
-    });
+    let archive = archiver('zip', {zlib: {level: 9}});
     output.on('close', function () {
         console.log(archive.pointer() + ' total bytes');
         console.log('Export: ', packName + '-' + packVersion + '.zip created');
         // rimraf(path.join(__dirname, directories.export.root), (err) => {
         //     if (err) return console.log(err);
-        //     console.log('Cleaning up folders')
+        //     console.log('Cleaning up foldesrs')
         // })
     });
     output.on('end', function () {
@@ -304,10 +302,8 @@ function compress() {
     });
     archive.on('warning', function (err) {
         if (err.code === 'ENOENT') {
-            // log warning
             console.warn("Warning: ENOENT")
         } else {
-            // throw error
             throw err;
         }
     });

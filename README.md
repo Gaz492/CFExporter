@@ -1,11 +1,11 @@
 # Twitch Minecraft Modpack Exporter
 
-This tool allows you to create a twitch compatible export of any minecraft modpack from any launcher.
+THIS IS CURRENTLY A PROOF OF CONCEPT & MAY NOT WORK CORRECTLY ALL THE TIME
 
+This tools was designed to allows you to create a Twitch Minecraft modpack export from other launchers such as MultiMC all you need to do s provide the path to the root of your Minecraft instance and follow the instructions.
 ## Usage
-
 ### Windows
-open command prompt in the same folder as `twitch-export-win.exe` and run the following command
+Open command prompt in the same folder as `twitch-export-win.exe` and run the following command
 
 `twitch-export-win.exe -d <path to mc instance>`
 
