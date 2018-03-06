@@ -59,6 +59,7 @@ function getCurseMeta() {
 
     let options = {
         url: 'https://cursemeta.dries007.net/raw_mods.json.gz',
+        method: 'GET',
         headers: {
             'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
         }
