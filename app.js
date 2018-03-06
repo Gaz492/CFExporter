@@ -10,82 +10,28 @@ const ncp = require('ncp');
 const archiver = require('archiver');
 const gunzip = require('gunzip-file');
 
-const questions = [
-    {
-        type: 'input',
-        name: 'packName',
-        message: 'Please enter pack name'
+const questions = [];
+const directories = {
+    export: {
+        root: 'export',
+        overrides: 'overrides',
+        mods: 'mods'
     },
-    {
-        type: 'input',
-        name: 'packVersion',
-        message: 'Please enter pack version (e.g 1.0.0)',
-        default: function () {
-            return "1.0.0"
-        },
-        validate: function (value) {
-            let pass = value.match(/(\d+)\.(\d+)\.(\d+)/i);
-            if (pass) {
-                return true;
-            }
-            return "Please enter valid version (e.g. 1.0.0)"
-        }
-    },
-    {
-        type: 'input',
-        name: 'packAuthor',
-        message: 'Please enter pack author'
-    },
-    {
-        type: 'input',
-        name: 'mcVersion',
-        message: 'Minecraft version (e.g 1.12.2)',
-        default: function () {
-            return "1.12.2"
-        },
-        validate: function (value) {
-            let pass = value.match(/(\d+)\.(\d+)\.(\d+)/i);
-            if (pass) {
-                return true;
-            }
-            return "Please enter valid version (e.g. 1.12.2)"
-        }
-    },
-    {
-        type: 'input',
-        name: 'forgeVersion',
-        message: 'Forge Version (e.g 14.23.2.2624)',
-        default: function () {
-            return "14.23.2.2624"
-        },
-        validate: function (value) {
-            let pass = value.match(/(\d+)\.(\d+)\.(\d+)\.(\d+)/i);
-            if (pass) {
-                return true;
-            }
-            return "Please enter valid version (e.g. 14.23.2.2624)"
-        }
-    }
-];
+    meta: 'meta'
+};
 
 let packName;
 let packVersion;
 let packAuthor;
 let mcVersion;
 let forgeVersion;
+let curseJson;
+
 let projectObj = [];
 let modList = [];
 let foundMods = [];
-let copyList = ['config'];
-let curseJson;
-const directories = {
-    export: {
-      root: 'export',
-      overrides: 'overrides',
-      mods: 'mods'
-    },
-    meta: 'meta'
-};
+let copyList = [];
+
 
 if (!fs.existsSync(path.join(__dirname, directories.meta))) {
     fs.mkdirSync(path.join(__dirname, directories.meta))
@@ -137,11 +83,11 @@ function run() {
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
-        // .option('-n, --name <packName>', 'Export Name')
-        // .option('-mv, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
-        // .option('-pv, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
-        // .option('-a, --author <author>', 'Author of pack')
-        // .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
+        .option('-n, --packName <packName>', 'Export Name')
+        .option('-mv, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
+        .option('-pv, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
+        .option('-a, --author <author>', 'Author of pack')
+        .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
         .parse(process.argv);
 
     if (program.include) {
@@ -149,6 +95,73 @@ function run() {
             copyList.push(item)
         });
     }
+
+    if(!program.packName){
+        questions.push({
+            type: 'input',
+            name: 'packName',
+            message: 'Please enter pack name'
+        })
+    }
+    if(!program.packVersion){
+        questions.push({
+            type: 'input',
+            name: 'packVersion',
+            message: 'Please enter pack version (e.g 1.0.0)',
+            default: function () {
+                return "1.0.0"
+            },
+            validate: function (value) {
+                let pass = value.match(/(\d+)\.(\d+)\.(\d+)/i);
+                if (pass) {
+                    return true;
+                }
+                return "Please enter valid version (e.g. 1.0.0)"
+            }
+        })
+    }
+    if(!program.author){
+        questions.push({
+            type: 'input',
+            name: 'packAuthor',
+            message: 'Please enter pack author'
+        })
+    }
+    if(!program.mcVersion){
+        questions.push({
+            type: 'input',
+            name: 'mcVersion',
+            message: 'Minecraft version (e.g 1.12.2)',
+            default: function () {
+                return "1.12.2"
+            },
+            validate: function (value) {
+                let pass = value.match(/(\d+)\.(\d+)\.(\d+)/i);
+                if (pass) {
+                    return true;
+                }
+                return "Please enter valid version (e.g. 1.12.2)"
+            }
+        })
+    }
+    if(!program.forgeVersion){
+        questions.push({
+            type: 'input',
+            name: 'forgeVersion',
+            message: 'Forge Version (e.g 14.23.2.2624)',
+            default: function () {
+                return "14.23.2.2624"
+            },
+            validate: function (value) {
+                let pass = value.match(/(\d+)\.(\d+)\.(\d+)\.(\d+)/i);
+                if (pass) {
+                    return true;
+                }
+                return "Please enter valid version (e.g. 14.23.2.2624)"
+            }
+        })
+    }
+
 
     if (program.dir) {
         inquirer.prompt(questions).then(answers => {
@@ -191,7 +204,6 @@ function listMods(modsFolder) {
 }
 
 function getProjectID() {
-    let tmp = 0;
     modList.forEach(mod => {
         Object.entries(curseJson).forEach(project => {
             project[1]['GameVersionLatestFiles'].find(files => {
@@ -210,7 +222,6 @@ function getProjectID() {
             })
         });
     });
-
     createExport();
 }
 
