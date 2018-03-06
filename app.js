@@ -78,18 +78,25 @@ let modList = [];
 let foundMods = [];
 let copyList = ['config'];
 let curseJson;
+const directories = {
+    export: {
+      root: 'export',
+      overrides: 'overrides',
+      mods: 'mods'
+    },
+    meta: 'meta'
+};
 
-if (!fs.existsSync('meta')) {
-    fs.mkdirSync('meta')
+if (!fs.existsSync(path.join(__dirname, directories.meta))) {
+    fs.mkdirSync(path.join(__dirname, directories.meta))
 }
 
-if (fs.existsSync('export')) {
-    rimraf('./export', (err) => {
+if (fs.existsSync(path.join(__dirname, directories.export.root))) {
+    rimraf(path.join(__dirname, directories.export.root), (err) => {
         if (err) return console.log(err);
     })
 }
 
-// checkMeta();
 getCurseMeta();
 
 function getCurseMeta() {
@@ -109,9 +116,9 @@ function getCurseMeta() {
         .pipe(fs.createWriteStream('./meta/raw_mods.json.gz'))
         .on('close', function () {
             console.log('File written!');
-            gunzip('./meta/raw_mods.json.gz', './meta/raw_mods.json', () =>{
+            gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () =>{
                 console.log('JSON Archive extracted');
-                fs.readFile('./meta/raw_mods.json', 'utf8', (err, data) => {
+                fs.readFile(path.join(__dirname, directories.meta, 'raw_mods.json'), 'utf8', (err, data) => {
                     if(err) return console.log(err);
                     curseJson = JSON.parse(data)['Data'];
                     run();
@@ -208,14 +215,14 @@ function getProjectID() {
 }
 
 function createExport() {
-    if (!fs.existsSync('export')) {
-        fs.mkdirSync('export')
+    if (!fs.existsSync(path.join(__dirname, directories.export.root))) {
+        fs.mkdirSync(path.join(__dirname, directories.export.root))
     }
-    if (!fs.existsSync('export/overrides')) {
-        fs.mkdirSync('export/overrides')
+    if (!fs.existsSync(path.join(__dirname, directories.export.root, directories.export.overrides))) {
+        fs.mkdirSync(path.join(__dirname, directories.export.root, directories.export.overrides))
     }
-    if (!fs.existsSync('export/overrides/mods')) {
-        fs.mkdirSync('export/overrides/mods')
+    if (!fs.existsSync(path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods))) {
+        fs.mkdirSync(path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods))
     }
 
     let manifest = {
@@ -236,7 +243,7 @@ function createExport() {
         files: projectObj,
         overrides: "overrides"
     };
-    fs.writeFile("./export/manifest.json", JSON.stringify(manifest), function (err) {
+    fs.writeFile(path.join(__dirname, directories.export, 'manifest.json'), JSON.stringify(manifest), function (err) {
         if (err) {
             return console.log(err);
         }
@@ -247,7 +254,7 @@ function createExport() {
     }, new Set(foundMods));
 
     checkDiff.forEach(mod => {
-        fs.copyFile(path.join(program.dir, 'mods', mod), './export/overrides/mods/' + mod, (err) => {
+        fs.copyFile(path.join(program.dir, 'mods', mod), path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods) + mod, (err) => {
             if (err) return console.log('An error occurred during file copying', err);
         })
     });
@@ -255,7 +262,7 @@ function createExport() {
     let fileToCopy = new Promise((resolve, reject) => {
         let itemsCopied = 0;
         copyList.forEach((item, index, array) => {
-            ncp(path.join(program.dir, item), './export/overrides/' + item, (err) => {
+            ncp(path.join(program.dir, item), path.join(__dirname, directories.export.root, directories.export.overrides) + item, (err) => {
                 if (err) return console.log('An error occurred during copying: ' + item, err);
                 console.log('Copied:', item);
                 itemsCopied++;
@@ -297,6 +304,6 @@ function compress() {
     });
 
     archive.pipe(output);
-    archive.directory('export', false);
+    archive.directory(path.join(__dirname, directories.export), false);
     archive.finalize();
 }
