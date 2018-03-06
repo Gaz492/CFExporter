@@ -296,10 +296,10 @@ function compress() {
         console.log(archive.pointer() + ' total bytes');
         console.log('archiver has been finalized and the output file descriptor has closed.');
         console.log(packName + '-' + packVersion + '.zip created');
-        rimraf(path.join(__dirname, directories.export.root), (err) => {
-            if (err) return console.log(err);
-            console.log('Cleaning up folders')
-        })
+        // rimraf(path.join(__dirname, directories.export.root), (err) => {
+        //     if (err) return console.log(err);
+        //     console.log('Cleaning up folders')
+        // })
     });
 
     output.on('end', function () {
