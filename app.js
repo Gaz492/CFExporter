@@ -291,7 +291,6 @@ function compress() {
     let archive = archiver('zip', {
         zlib: {level: 9}
     });
-
     output.on('close', function () {
         console.log(archive.pointer() + ' total bytes');
         console.log('Export: ', packName + '-' + packVersion + '.zip created');
@@ -300,13 +299,13 @@ function compress() {
         //     console.log('Cleaning up folders')
         // })
     });
-
     output.on('end', function () {
         console.log('Data has been drained');
     });
     archive.on('warning', function (err) {
         if (err.code === 'ENOENT') {
             // log warning
+            console.warn("Warning: ENOENT")
         } else {
             // throw error
             throw err;
@@ -315,7 +314,6 @@ function compress() {
     archive.on('error', function (err) {
         throw err;
     });
-
     archive.pipe(output);
     archive.directory(path.join(__dirname, directories.export), false);
     archive.finalize();
