@@ -42,41 +42,45 @@ if (fs.existsSync(path.join(__dirname, directories.export.root))) {
 getCurseMeta();
 
 function getCurseMeta() {
-    // let options = {
-    //     url: 'https://cursemeta.dries007.net/raw_mods.json',
-    //     method: 'GET',
-    //     json: true
-    // };
-    // request(options, function (error, response, body) {
-    //     if (error) console.log(error);
-    //
-    //     curseJson = body['Data'];
-    //     run()
-    // });
-    if (!fs.existsSync(path.join(__dirname, directories.meta))) {
-        fs.mkdirSync(path.join(__dirname, directories.meta))
-    }
-
     let options = {
-        url: 'https://cursemeta.dries007.net/raw_mods.json.gz',
+        url: 'http://wolf.gaz492.uk:8050/api/addon',
         method: 'GET',
         headers: {
             'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
-        }
+        },
+        json: true
     };
-    request(options)
-        .pipe(fs.createWriteStream(path.join(__dirname, directories.meta, 'raw_mods.json.gz')))
-        .on('close', function () {
-            console.log('File written!');
-            gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () => {
-                console.log('JSON Archive extracted');
-                fs.readFile(path.join(__dirname, directories.meta, 'raw_mods.json'), 'utf8', (err, data) => {
-                    if (err) return console.log(err);
-                    curseJson = JSON.parse(data)['Data'];
-                    run();
-                });
-            });
-        });
+    request(options, function (error, response, body) {
+        if (error) console.log(error);
+
+        curseJson = body;
+        run()
+    });
+
+    // if (!fs.existsSync(path.join(__dirname, directories.meta))) {
+    //     fs.mkdirSync(path.join(__dirname, directories.meta))
+    // }
+
+    // let options = {
+    //     url: 'https://cursemeta.dries007.net/raw_mods.json.gz',
+    //     method: 'GET',
+    //     headers: {
+    //         'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
+    //     }
+    // };
+    // request(options)
+    //     .pipe(fs.createWriteStream(path.join(__dirname, directories.meta, 'raw_mods.json.gz')))
+    //     .on('close', function () {
+    //         console.log('File written!');
+    //         gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () => {
+    //             console.log('JSON Archive extracted');
+    //             fs.readFile(path.join(__dirname, directories.meta, 'raw_mods.json'), 'utf8', (err, data) => {
+    //                 if (err) return console.log(err);
+    //                 curseJson = JSON.parse(data)['Data'];
+    //                 run();
+    //             });
+    //         });
+    //     });
 }
 
 function list(val) {
@@ -90,9 +94,9 @@ function run() {
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
         .option('-n, --packName <packName>', 'Export Name')
-        .option('-mv, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
-        .option('-pv, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
-        .option('-a, --author <author>', 'Author of pack')
+        .option('-m, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
+        .option('-p, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
+        .option('-a, --packAuthor <author>', 'Author of pack')
         .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
         .parse(process.argv);
 
@@ -107,6 +111,8 @@ function run() {
             name: 'packName',
             message: 'Please enter pack name'
         })
+    }else{
+        packName = program.packName;
     }
     if (!program.packVersion) {
         questions.push({
@@ -124,13 +130,17 @@ function run() {
                 return "Please enter valid version (e.g. 1.0.0)"
             }
         })
+    }else{
+        packVersion = program.packVersion;
     }
-    if (!program.author) {
+    if (!program.packAuthor) {
         questions.push({
             type: 'input',
             name: 'packAuthor',
             message: 'Please enter pack author'
         })
+    }else{
+        packAuthor = program.packAuthor;
     }
     if (!program.mcVersion) {
         questions.push({
@@ -148,6 +158,8 @@ function run() {
                 return "Please enter valid version (e.g. 1.12.2)"
             }
         })
+    }else{
+        mcVersion = program.mcVersion;
     }
     if (!program.forgeVersion) {
         questions.push({
@@ -165,10 +177,14 @@ function run() {
                 return "Please enter valid version (e.g. 14.23.2.2624)"
             }
         })
+    }else{
+        forgeVersion = program.forgeVersion;
     }
 
-
-    if (program.dir) {
+    if (program.dir && program.packName && program.packAuthor && program.packVersion && program.mcVersion && program.forgeVersion){
+        readDirectory(program.dir)
+    }
+    else if (program.dir) {
         inquirer.prompt(questions).then(answers => {
             packName = answers.packName;
             packVersion = answers.packVersion;
@@ -211,20 +227,40 @@ function listMods(modsFolder) {
 function getProjectID() {
     modList.forEach(mod => {
         Object.entries(curseJson).forEach(project => {
-            project[1]['GameVersionLatestFiles'].find(files => {
-                if (files['ProjectFileName'] === mod) {
-                    if (files['GameVesion'] >= mcVersion.split('.').slice(0, 2).join('.')) {
-                        projectObj.push({
-                            projectID: project[1]['Id'],
-                            fileID: files['ProjectFileID'],
-                            filename: files['ProjectFileName'],
-                            required: true
-                        });
-                        foundMods.push(mod);
-                        return true;
+            if(!foundMods.includes(mod)){
+                project[1]['GameVersionLatestFiles'].find(files => {
+                    if (files['ProjectFileName'].split('.jar')[0] === mod.split('.jar')[0]) {
+                        if (files['GameVesion'] >= mcVersion.split('.').slice(0, 2).join('.')) {
+                            projectObj.push({
+                                projectID: project[1]['Id'],
+                                fileID: files['ProjectFileID'],
+                                filename: files['ProjectFileName'],
+                                required: true
+                            });
+                            if(!foundMods.includes(mod)){
+                                foundMods.push(mod);
+                            }
+                            return true;
+                        }
                     }
-                }
-            })
+                });
+            }
+            if(!foundMods.includes(mod)){
+                project[1]['LatestFiles'].find(files => {
+                    if (files['FileNameOnDisk'] === mod) {
+                        if (files['GameVersion'] >= mcVersion.split('.').slice(0, 2).join('.')) {
+                            projectObj.push({
+                                projectID: project[1]['Id'],
+                                fileID: files['Id'],
+                                filename: files['FileNameOnDisk'],
+                                required: true
+                            });
+                            foundMods.push(mod);
+                            return true;
+                        }
+                    }
+                })
+            }
         });
     });
     createExport();
@@ -259,7 +295,7 @@ function createExport() {
         files: projectObj,
         overrides: "overrides"
     };
-    fs.writeFile(path.join(__dirname, directories.export, 'manifest.json'), JSON.stringify(manifest), function (err) {
+    fs.writeFile(path.join(__dirname, directories.export.root, 'manifest.json'), JSON.stringify(manifest), function (err) {
         if (err) {
             return console.log(err);
         }
@@ -271,7 +307,7 @@ function createExport() {
     }, new Set(foundMods));
 
     checkDiff.forEach(mod => {
-        fs.copyFile(path.join(program.dir, 'mods', mod), path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods) + mod, (err) => {
+        fs.copyFile(path.join(program.dir, 'mods', mod), path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods, mod), (err) => {
             if (err) return console.log('An error occurred during file copying', err);
         })
     });
@@ -279,7 +315,7 @@ function createExport() {
     let fileToCopy = new Promise((resolve, reject) => {
         let itemsCopied = 0;
         copyList.forEach((item, index, array) => {
-            ncp(path.join(program.dir, item), path.join(__dirname, directories.export.root, directories.export.overrides) + item, (err) => {
+            ncp(path.join(program.dir, item), path.join(__dirname, directories.export.root, directories.export.overrides, item), (err) => {
                 if (err) return console.log('An error occurred during copying: ' + item, err);
                 console.log('Copied:', item);
                 itemsCopied++;
@@ -318,6 +354,6 @@ function compress() {
         throw err;
     });
     archive.pipe(output);
-    archive.directory(path.join(__dirname, directories.export), false);
+    archive.directory(path.join(__dirname, directories.export.root), false);
     archive.finalize();
 }
