@@ -286,7 +286,7 @@ function createExport() {
 }
 
 function compress() {
-    console.log('Compressing Output');
+    console.log('Creating Export...');
     let output = fs.createWriteStream(packName + '-' + packVersion + '.zip');
     let archive = archiver('zip', {
         zlib: {level: 9}
@@ -294,8 +294,7 @@ function compress() {
 
     output.on('close', function () {
         console.log(archive.pointer() + ' total bytes');
-        console.log('archiver has been finalized and the output file descriptor has closed.');
-        console.log(packName + '-' + packVersion + '.zip created');
+        console.log('Export: ', packName + '-' + packVersion + '.zip created');
         // rimraf(path.join(__dirname, directories.export.root), (err) => {
         //     if (err) return console.log(err);
         //     console.log('Cleaning up folders')
