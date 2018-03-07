@@ -9,6 +9,7 @@ const archiver = require('archiver');
 
 const questions = [];
 const directories = {
+    base: './',
     export: {
         root: 'temp',
         overrides: 'overrides',
@@ -30,8 +31,8 @@ let foundMods = [];
 let copyList = [];
 
 
-if (fs.existsSync(path.join(__dirname, directories.export.root))) {
-    rimraf(path.join(__dirname, directories.export.root), (err) => {
+if (fs.existsSync(path.join(directories.base, directories.export.root))) {
+    rimraf(path.join(directories.base, directories.export.root), (err) => {
         if (err) return console.log(err);
     })
 }
@@ -53,31 +54,6 @@ function getCurseMeta() {
         curseJson = body;
         run()
     });
-
-    // if (!fs.existsSync(path.join(__dirname, directories.meta))) {
-    //     fs.mkdirSync(path.join(__dirname, directories.meta))
-    // }
-
-    // let options = {
-    //     url: 'https://cursemeta.dries007.net/raw_mods.json.gz',
-    //     method: 'GET',
-    //     headers: {
-    //         'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
-    //     }
-    // };
-    // request(options)
-    //     .pipe(fs.createWriteStream(path.join(__dirname, directories.meta, 'raw_mods.json.gz')))
-    //     .on('close', function () {
-    //         console.log('File written!');
-    //         gunzip(path.join(__dirname, directories.meta, 'raw_mods.json.gz'), path.join(__dirname, directories.meta, 'raw_mods.json'), () => {
-    //             console.log('JSON Archive extracted');
-    //             fs.readFile(path.join(__dirname, directories.meta, 'raw_mods.json'), 'utf8', (err, data) => {
-    //                 if (err) return console.log(err);
-    //                 curseJson = JSON.parse(data)['Data'];
-    //                 run();
-    //             });
-    //         });
-    //     });
 }
 
 function list(val) {
@@ -264,14 +240,14 @@ function getProjectID() {
 }
 
 function createExport() {
-    if (!fs.existsSync(path.join(__dirname, directories.export.root))) {
-        fs.mkdirSync(path.join(__dirname, directories.export.root))
+    if (!fs.existsSync(path.join(directories.base, directories.export.root))) {
+        fs.mkdirSync(path.join(directories.base, directories.export.root))
     }
-    if (!fs.existsSync(path.join(__dirname, directories.export.root, directories.export.overrides))) {
-        fs.mkdirSync(path.join(__dirname, directories.export.root, directories.export.overrides))
+    if (!fs.existsSync(path.join(directories.base, directories.export.root, directories.export.overrides))) {
+        fs.mkdirSync(path.join(directories.base, directories.export.root, directories.export.overrides))
     }
-    if (!fs.existsSync(path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods))) {
-        fs.mkdirSync(path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods))
+    if (!fs.existsSync(path.join(directories.base, directories.export.root, directories.export.overrides, directories.export.mods))) {
+        fs.mkdirSync(path.join(directories.base, directories.export.root, directories.export.overrides, directories.export.mods))
     }
 
     let manifest = {
@@ -292,7 +268,7 @@ function createExport() {
         files: projectObj,
         overrides: "overrides"
     };
-    fs.writeFile(path.join(__dirname, directories.export.root, 'manifest.json'), JSON.stringify(manifest), function (err) {
+    fs.writeFile(path.join(directories.base, directories.export.root, 'manifest.json'), JSON.stringify(manifest), function (err) {
         if (err) {
             return console.log(err);
         }
@@ -304,7 +280,7 @@ function createExport() {
     }, new Set(foundMods));
 
     checkDiff.forEach(mod => {
-        fs.copyFile(path.join(program.dir, 'mods', mod), path.join(__dirname, directories.export.root, directories.export.overrides, directories.export.mods, mod), (err) => {
+        fs.copyFile(path.join(program.dir, 'mods', mod), path.join(directories.base, directories.export.root, directories.export.overrides, directories.export.mods, mod), (err) => {
             if (err) return console.log('An error occurred during file copying', err);
         })
     });
@@ -312,7 +288,7 @@ function createExport() {
     let fileToCopy = new Promise((resolve, reject) => {
         let itemsCopied = 0;
         copyList.forEach((item, index, array) => {
-            ncp(path.join(program.dir, item), path.join(__dirname, directories.export.root, directories.export.overrides, item), (err) => {
+            ncp(path.join(program.dir, item), path.join(directories.base, directories.export.root, directories.export.overrides, item), (err) => {
                 if (err) return console.log('An error occurred during copying: ' + item, err);
                 console.log('Copied:', item);
                 itemsCopied++;
@@ -351,6 +327,6 @@ function compress() {
         throw err;
     });
     archive.pipe(output);
-    archive.directory(path.join(__dirname, directories.export.root), false);
+    archive.directory(path.join(directories.base, directories.export.root), false);
     archive.finalize();
 }
