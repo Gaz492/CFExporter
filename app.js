@@ -46,14 +46,14 @@ function getCurseMeta() {
     }
     let jsonMD5Hash;
     let md5Options = {
-        url: 'https://s3.gaz492.uk/public/curseProjects.json.md5',
+        url: 'https://curse.alwa.io/curseProjects.json.md5',
         method: 'GET',
         headers: {
             'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
         }
     };
     let jsonOptions = {
-        url: 'https://s3.gaz492.uk/public/curseProjects.json',
+        url: 'https://curse.alwa.io/curseProjects.json',
         method: 'GET',
         headers: {
             'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
@@ -68,6 +68,7 @@ function getCurseMeta() {
 
                 jsonMD5Hash = body;
                 if (jsonMD5Hash.split('\n')[0] !== jsonHash) {
+                    console.log('Outdated JSON downloading update', jsonMD5Hash.split('\n')[0], jsonHash);
                     request(jsonOptions)
                         .pipe(fs.createWriteStream(path.join(directories.meta, 'curseProjects.json')))
                         .on('close', function () {
@@ -96,7 +97,7 @@ function list(val) {
 function run() {
     curseJson = JSON.parse(fs.readFileSync(path.join(directories.meta, 'curseProjects.json')));
     program
-        .version('1.3.1', '-v, --version')
+        .version('1.3.2', '-v, --version')
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
