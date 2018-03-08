@@ -41,6 +41,9 @@ if (fs.existsSync(path.join(directories.base, directories.export.root))) {
 getCurseMeta();
 
 function getCurseMeta() {
+    if(!fs.existsSync(path.join(directories.base, directories.meta))){
+        fs.mkdirSync(path.join(directories.base, directories.meta))
+    }
     let jsonMD5Hash;
     let md5Options = {
         url: 'https://s3.gaz492.uk/public/curseProjects.json.md5',
@@ -93,13 +96,13 @@ function list(val) {
 function run() {
     curseJson = JSON.parse(fs.readFileSync(path.join(directories.meta, 'curseProjects.json')));
     program
-        .version('1.0.0', '-v, --version')
+        .version('1.3.1', '-v, --version')
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
         .option('-n, --packName <packName>', 'Export Name')
         .option('-m, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
-        .option('-p, --packVersion <packversion>', 'Pack Version (e.g 1.3.0')
+        .option('-p, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
         .option('-a, --packAuthor <author>', 'Author of pack')
         .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
         .parse(process.argv);
@@ -304,9 +307,9 @@ function createExport() {
             });
         })
     });
-    // fileToCopy.then(() => {
-    //     compress()
-    // })
+    fileToCopy.then(() => {
+        compress()
+    })
 }
 
 function compress() {
@@ -316,10 +319,11 @@ function compress() {
     output.on('close', function () {
         console.log(archive.pointer() + ' total bytes');
         console.log('Export: ', packName + '-' + packVersion + '.zip created');
-        // rimraf(path.join(__dirname, directories.export.root), (err) => {
-        //     if (err) return console.log(err);
-        //     console.log('Cleaning up foldesrs')
-        // })
+        rimraf(path.join(directories.base, directories.export.root), (err) => {
+            if (err) return console.log(err);
+
+            console.log('Cleaning up folders')
+        })
     });
     output.on('end', function () {
         console.log('Data has been drained');
