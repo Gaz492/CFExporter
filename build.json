@@ -1,0 +1,6 @@
+{
+  "packAuthor": "Gaz",
+  "minecraftVersion": "1.12.2",
+  "forgeVersion": "14.23.2.2624",
+  "includes": ["config", "local", "maps", "scripts"]
+}

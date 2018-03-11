@@ -38,8 +38,6 @@ if (fs.existsSync(path.join(directories.base, directories.export.root))) {
     })
 }
 
-getCurseMeta();
-
 function getCurseMeta() {
     if(!fs.existsSync(path.join(directories.base, directories.meta))){
         fs.mkdirSync(path.join(directories.base, directories.meta))
@@ -106,6 +104,7 @@ function run() {
         .option('-p, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
         .option('-a, --packAuthor <author>', 'Author of pack')
         .option('-f, --forgeVersion <version>', 'Forge version (e.g 14.23.2.2624)')
+        .option('-c, --config <file>', 'Config file to get pack variables')
         .parse(process.argv);
 
     if (program.include) {
@@ -189,7 +188,17 @@ function run() {
         forgeVersion = program.forgeVersion;
     }
 
-    if (program.dir && program.packName && program.packAuthor && program.packVersion && program.mcVersion && program.forgeVersion) {
+    if(program.config && program.dir && program.packName && program.packVersion){
+        const exportCfg = JSON.parse(fs.readFileSync(path.join(directories.base, program.config)));
+        // packName = exportCfg['packName'];
+        packAuthor = exportCfg['packAuthor'];
+        // packVersion = exportCfg['packVersion'];
+        mcVersion = exportCfg['minecraftVersion'];
+        forgeVersion = exportCfg['forgeVersion'];
+        copyList = exportCfg['includes'];
+        readDirectory(program.dir)
+    }
+    else if (program.dir && program.packName && program.packAuthor && program.packVersion && program.mcVersion && program.forgeVersion) {
         readDirectory(program.dir)
     }
     else if (program.dir) {
@@ -345,3 +354,6 @@ function compress() {
     archive.directory(path.join(directories.base, directories.export.root), false);
     archive.finalize();
 }
+
+
+getCurseMeta();
