@@ -7,8 +7,8 @@ const request = require('request');
 const rimraf = require('rimraf');
 const ncp = require('ncp');
 const archiver = require('archiver');
+const pJson = require('./package');
 
-const questions = [];
 const directories = {
     base: './',
     export: {
@@ -18,7 +18,11 @@ const directories = {
     },
     meta: 'meta'
 };
+
+const appVersion = pJson['version'];
+
 const apiURL = 'https://curse.gaz492.uk';
+const questions = [];
 let packName;
 let packVersion;
 let packAuthor;
@@ -47,14 +51,14 @@ function getCurseMeta() {
         url: apiURL + '/curseProjects.json.md5',
         method: 'GET',
         headers: {
-            'User-Agent': 'Twitch-Exporter/1.3.x (+https://github.com/Gaz492/twitch-export-builder)'
+            'User-Agent': 'Twitch-Exporter/' + appVersion + ' (+https://github.com/Gaz492/twitch-export-builder)'
         }
     };
     let jsonOptions = {
         url: apiURL + '/curseProjects.json',
         method: 'GET',
         headers: {
-            'User-Agent': 'Twitch-Exporter/1.3.x (+https://github.com/Gaz492/twitch-export-builder)'
+            'User-Agent': 'Twitch-Exporter/' + appVersion + ' (+https://github.com/Gaz492/twitch-export-builder)'
         },
         json: true
     };
@@ -95,7 +99,7 @@ function list(val) {
 function run() {
     curseJson = JSON.parse(fs.readFileSync(path.join(directories.meta, 'curseProjects.json')))['data'];
     program
-        .version('1.3.2', '-v, --version')
+        .version(appVersion, '-v, --version')
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
