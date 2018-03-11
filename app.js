@@ -18,7 +18,7 @@ const directories = {
     },
     meta: 'meta'
 };
-
+const apiURL = 'https://curse.gaz492.uk';
 let packName;
 let packVersion;
 let packAuthor;
@@ -46,17 +46,17 @@ function getCurseMeta() {
     }
     let jsonMD5Hash;
     let md5Options = {
-        url: 'https://curse.alwa.io/curseProjects.json.md5',
+        url: apiURL + '/curseProjects.json.md5',
         method: 'GET',
         headers: {
-            'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
+            'User-Agent': 'Twitch-Exporter/1.3.x (+https://github.com/Gaz492/twitch-export-builder)'
         }
     };
     let jsonOptions = {
-        url: 'https://curse.alwa.io/curseProjects.json',
+        url: apiURL + '/curseProjects.json',
         method: 'GET',
         headers: {
-            'User-Agent': 'Twitch-Exporter/1.2.0 (+https://github.com/Gaz492/twitch-export-builder)'
+            'User-Agent': 'Twitch-Exporter/1.3.x (+https://github.com/Gaz492/twitch-export-builder)'
         },
         json: true
     };
@@ -95,7 +95,7 @@ function list(val) {
 }
 
 function run() {
-    curseJson = JSON.parse(fs.readFileSync(path.join(directories.meta, 'curseProjects.json')));
+    curseJson = JSON.parse(fs.readFileSync(path.join(directories.meta, 'curseProjects.json')))['data'];
     program
         .version('1.3.2', '-v, --version')
         .usage('[options] <filepath>')
