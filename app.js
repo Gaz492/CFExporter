@@ -237,14 +237,16 @@ function getProjectID() {
     modList.forEach(mod => {
         Object.entries(curseJson).forEach(project => {
             if((project[1]['fileName'].split('.jar')[0] === mod.split('.jar')[0])){
-                foundMods.push(mod);
-                console.log(temp++, mod);
-                projectObj.push({
-                    projectID: project[1]['projectID'],
-                    fileID: project[1]['projectFileID'],
-                    filename: project[1]['fileName'],
-                    required: true
-                });
+                if(project[1]['gameVersion'].includes(mcVersion)){
+                    foundMods.push(mod);
+                    console.log(temp++, mod);
+                    projectObj.push({
+                        projectID: project[1]['projectID'],
+                        fileID: project[1]['projectFileID'],
+                        filename: project[1]['fileName'],
+                        required: true
+                    });
+                }
             }
         });
     });
