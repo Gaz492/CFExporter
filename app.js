@@ -103,6 +103,7 @@ function run() {
         .usage('[options] <filepath>')
         .option('-d, --dir <path>', 'Path to root folder of Minecraft instance')
         .option('-i, --include <config,maps,options.txt>', "List of files/folders to include in export")
+        .option('-e, --exclude <server.dat,saves>', "List of files/folders to exclude from the export")
         .option('-n, --packName <packName>', 'Export Name')
         .option('-m, --mcVersion <version>', 'Minecraft Version (e.g 1.12.2)')
         .option('-p, --packVersion <packversion>', 'Pack Version (e.g 1.0.0')
