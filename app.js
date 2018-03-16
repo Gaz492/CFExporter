@@ -250,7 +250,7 @@ function getProjectID() {
     let temp = 1;
     modList.forEach(mod => {
         Object.entries(curseJson).forEach(project => {
-            if((project[1]['fileName'].split('.jar')[0] === mod.split('.jar')[0])){
+            if((project[1]['fileName'].split('.jar')[0].toLowerCase() === mod.split('.jar')[0].toLowerCase())){
                 if(project[1]['gameVersion'].includes(mcVersion)){
                     foundMods.push(mod);
                     console.log(temp++, mod);
