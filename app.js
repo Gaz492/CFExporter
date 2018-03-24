@@ -316,12 +316,19 @@ function createExport() {
     let fileToCopy = new Promise((resolve, reject) => {
         let itemsCopied = 0;
         copyList.forEach((item, index, array) => {
-            ncp(path.join(program.dir, item), path.join(directories.base, directories.export.root, directories.export.overrides, item), (err) => {
-                if (err) return console.log('An error occurred during copying: ' + item, err);
-                console.log('Copied:', item);
+            if(fs.existsSync(path.join(program.dir, item))){
+                ncp(path.join(program.dir, item), path.join(directories.base, directories.export.root, directories.export.overrides, item), (err) => {
+                    if (err) return console.log('An error occurred during copying: ' + item, err);
+                    console.log('Copied:', item);
+                    itemsCopied++;
+                    if (itemsCopied === array.length) resolve();
+                });
+            }else{
+                console.log("Skipping file/folder:", item);
                 itemsCopied++;
                 if (itemsCopied === array.length) resolve();
-            });
+            }
+
         })
     });
     fileToCopy.then(() => {
