@@ -1,13 +1,13 @@
-const program = require('commander');
-const inquirer = require('inquirer');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const request = require('request');
-const rimraf = require('rimraf');
-const ncp = require('ncp');
-const archiver = require('archiver');
-const pJson = require('./package');
+import program from 'commander'
+import inquirer from 'inquirer'
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
+import request from 'request'
+import rimraf from 'rimraf'
+import ncp from 'ncp'
+import archiver from 'archiver'
+import pJson from './package'
 
 const directories = {
     base: './',

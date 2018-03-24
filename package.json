@@ -7,7 +7,9 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
-    "build": "pkg app.js -t node8-linux-x64,node8-macos-x64,node8-win-x64 -o build/twitch-exporter"
+    "prestart": "babel src.js -o app.js",
+    "build": "pkg app.js -t node8-linux-x64,node8-macos-x64,node8-win-x64 -o build/twitch-exporter",
+    "prebuild": "babel src.js -o app.js"
   },
   "dependencies": {
     "archiver": "^2.1.1",
@@ -17,5 +19,9 @@
     "ncp": "^2.0.0",
     "request": "^2.83.0",
     "rimraf": "^2.6.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
   }
 }

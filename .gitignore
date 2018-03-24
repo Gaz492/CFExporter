@@ -14,3 +14,7 @@ meta/
 *.zip
 
 temp/
+
+app\.js
+
+yarn-error\.log
