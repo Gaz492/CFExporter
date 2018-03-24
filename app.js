@@ -74,10 +74,11 @@ function getCurseMeta() {
                     request(jsonOptions)
                         .pipe(fs.createWriteStream(path.join(directories.meta, 'curseProjects.json')))
                         .on('close', function () {
-                            console.log('JSON file written!');
+                            console.log('JSON file written!', jsonMD5Hash.split('\n')[0]);
                             run();
                         });
                 } else {
+                    console.log("Using existing JSON file", jsonHash);
                     run();
                 }
             });
@@ -222,7 +223,9 @@ function run() {
 
 
 function readDirectory(dirPath) {
+    console.log("Reading Minecraft directory");
     fs.readdir(dirPath, (err, files) => {
+        if(err) return console.log(err);
         files.forEach(file => {
             if (file === 'mods') {
                 listMods(path.join(dirPath, file))
@@ -233,12 +236,21 @@ function readDirectory(dirPath) {
 
 function listMods(modsFolder) {
     let mods = 0;
+    let removedFiles = 0;
+    console.log("Reading mods");
     fs.readdir(modsFolder, (err, files) => {
         files.forEach(file => {
-            if (path.extname(file) === '.jar') {
+            if (path.extname(file) !== '.jar') {
+                let arrIndex = files.indexOf(file);
+                if (arrIndex > -1) {
+                    files.splice(arrIndex, file);
+                    console.log("Removed:", file);
+                    removedFiles++;
+                }
+            }else if (path.extname(file) === '.jar'){
                 mods++;
                 modList.push(file);
-                if (mods === files.length) {
+                if (mods === files.length - removedFiles) {
                     getProjectID()
                 }
             }
@@ -247,6 +259,7 @@ function listMods(modsFolder) {
 }
 
 function getProjectID() {
+    console.log("Getting Project IDs");
     let temp = 1;
     modList.forEach(mod => {
         Object.entries(curseJson).forEach(project => {

@@ -1,6 +1,6 @@
 {
   "name": "twitch-export-builder",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "main": "app.js",
   "repository": "git@github.com:Gaz492/twitch-export-builder.git",
   "author": "Gareth Williams",
