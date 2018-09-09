@@ -10,13 +10,6 @@ import (
 	"strings"
 )
 
-//type buildJson struct {
-//	PackAuthor       string   `json:"packAuthor"`
-//	MinecraftVersion string   `json:"minecraftVersion"`
-//	ForgeVersion     string   `json:"forgeVersion"`
-//	Includes         []string `json:"includes"`
-//}
-
 func main() {
 	mcDirCLI := flag.String("d", "./", "Path to root folder of Minecraft instance")
 	//pVerCLI := flag.String("p", "1.0.0", "Pack Version (e.g 1.0.0)")
