@@ -56,7 +56,10 @@ func listMods(modsFolder string) {
 	}
 	for _, f := range files {
 		if filepath.Ext(f.Name()) == ".jar" {
-			fmt.Println(f.Name())
+			//fmt.Println(path.Join(modsFolder, "mods", f.Name()))
+			//fmt.Println(GetFileHash(path.Join(modsFolder, "mods", f.Name())))
+			filehash, _ := GetFileHash(path.Join(modsFolder, "mods", f.Name()))
+			fmt.Printf("%v %v\n", filehash, f.Name())
 		}
 	}
 }
