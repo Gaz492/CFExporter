@@ -26,6 +26,21 @@ func readBuildJson(buildJsonDir string) (buildJson) {
 	return buildCfg
 }
 
+func Difference(a, b []int) (diff []int) {
+	m := make(map[int]bool)
+
+	for _, item := range b {
+		m[item] = true
+	}
+
+	for _, item := range a {
+		if _, ok := m[item]; !ok {
+			diff = append(diff, item)
+		}
+	}
+	return
+}
+
 func getProjectIds(addons []int) (*fingerprintResponse, error) {
 	jsonPayload, _ := json.Marshal(addons)
 	response, err := GetHTTPResponse("POST", PROXY_API+"fingerprint", jsonPayload)
