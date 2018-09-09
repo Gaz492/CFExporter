@@ -199,6 +199,7 @@ func RecursiveZip(pathToZip, destinationPath string) error {
 		if err != nil {
 			return err
 		}
+		defer fsFile.Close()
 		_, err = io.Copy(zipFile, fsFile)
 		if err != nil {
 			return err
@@ -211,6 +212,25 @@ func RecursiveZip(pathToZip, destinationPath string) error {
 	err = myZip.Close()
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func RemoveContents(dir string) error {
+	d, err := os.Open(dir)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	names, err := d.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(dir, name))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

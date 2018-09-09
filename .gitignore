@@ -32,3 +32,5 @@ tests/
 tmp/
 
 *.zip
+
+\.vs/
