@@ -44,11 +44,11 @@ func readMCDIR(dirPath string) {
 		if strings.ToLower(f.Name()) == "mods" {
 			listMods(dirPath)
 		}
-		//fmt.Println(f.Name())
 	}
 }
 
 func listMods(modsFolder string) {
+	fmt.Println("Listing Mods")
 	var jarFingerprints []int
 	files, err := ioutil.ReadDir(path.Join(modsFolder, "mods"))
 	if err != nil {
@@ -56,32 +56,34 @@ func listMods(modsFolder string) {
 	}
 	for _, f := range files {
 		if filepath.Ext(f.Name()) == ".jar" {
-			//fmt.Println(path.Join(modsFolder, "mods", f.Name()))
-			//fmt.Println(GetFileHash(path.Join(modsFolder, "mods", f.Name())))
 			fileHash, _ := GetFileHash(path.Join(modsFolder, "mods", f.Name()))
 			jarFingerprints = append(jarFingerprints, fileHash)
-			//fmt.Printf("%v %v\n", jarFingerprints, f.Name())
 		}
 	}
 
-	//fMatchResp, _ := getProjectIds(jarFingerprints)
-
+	fMatchResp, _ := getProjectIds(jarFingerprints)
+	//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+	createExport(fMatchResp.ExactMatches)
 	//var test2 []fingerprintExactMatches
 	//test2 = fMatchResp.ExactMatches
 	//fmt.Println(test2[0].Id)
 
+}
+
+func createOverrides() {
 
 }
 
-func createExport(projectFiles []manifestFiles) {
+func createExport(projectFiles []fingerprintExactMatches) {
 	var modloader []manifestMinecraftModLoaders
 	var tempFiles []manifestFiles
-	tempFiles = append(tempFiles, manifestFiles{1278361, 4522342, true})
+	for _, file := range projectFiles {
+		tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
+	}
 	modloader = append(modloader, manifestMinecraftModLoaders{"forge-" + BuildConfig.ForgeVersion, true})
 	manifestMc := manifestMinecraft{BuildConfig.MinecraftVersion, modloader}
 	manifestB := manifestBase{manifestMc, "minecraftModpack", 1, *ExportName, *PackVersion, BuildConfig.PackAuthor, tempFiles, "overrides"}
 	// test below
 	addonsJson, _ := json.Marshal(manifestB)
 	ioutil.WriteFile("output.json", addonsJson, 0644)
-	//fmt.Printf("%+v", jsonResp)
 }
