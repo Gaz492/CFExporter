@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -17,6 +18,7 @@ var (
 	PackVersion    *string
 	ExportName     *string
 	BuildConfig    buildJson
+	PackDIR        string
 )
 
 func main() {
@@ -26,10 +28,9 @@ func main() {
 	buildConfig := flag.String("c", ".build.json", "Config file to get build variables")
 	ProxyAuthToken = flag.String("pt", "changeme", "Authentication token used to authenticate with Gaz's Twitch Proxy")
 	flag.Parse()
-	fmt.Println("Pack Ver:", *PackVersion)
-	fmt.Println("Export Name:", *ExportName)
 
 	BuildConfig = readBuildJson(*buildConfig)
+	PackDIR = *mcDirCLI
 	readMCDIR(*mcDirCLI)
 }
 
@@ -63,14 +64,52 @@ func listMods(modsFolder string) {
 
 	fMatchResp, _ := getProjectIds(jarFingerprints)
 	//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+	createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 	createExport(fMatchResp.ExactMatches)
-	//var test2 []fingerprintExactMatches
-	//test2 = fMatchResp.ExactMatches
-	//fmt.Println(test2[0].Id)
 
 }
 
-func createOverrides() {
+func createOverrides(missingMods []int) {
+	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
+		os.Mkdir("./tmp", 755)
+	}
+	if _, err := os.Stat("./tmp/overrides"); os.IsNotExist(err) {
+		os.Mkdir("./tmp/overrides", 755)
+	}
+	if _, err := os.Stat("./tmp/overrides/mods"); os.IsNotExist(err) {
+		os.Mkdir("./tmp/overrides/mods", 755)
+	}
+
+	files, err := ioutil.ReadDir(path.Join(PackDIR, "mods"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, f := range files {
+		if filepath.Ext(f.Name()) == ".jar" {
+			fileHash, _ := GetFileHash(path.Join(PackDIR, "mods", f.Name()))
+			if intInSlice(fileHash, missingMods) {
+				fmt.Println(f.Name())
+				modSrc := path.Join(PackDIR, "mods", f.Name())
+				CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
+			}
+		}
+	}
+
+	for _, includes := range BuildConfig.Includes {
+		fToInclude := path.Join(PackDIR, includes)
+		fi, err := os.Stat(fToInclude)
+		if err != nil {
+			continue
+		}
+		switch mode := fi.Mode(); {
+		case mode.IsDir():
+			// do directory stuff
+		CopyDir(fToInclude, "./tmp/overrides/"+includes)
+		case mode.IsRegular():
+			// do file stuff
+			CopyFile(fToInclude, "./tmp/overrides/"+includes)
+		}
+	}
 
 }
 
@@ -85,5 +124,6 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	manifestB := manifestBase{manifestMc, "minecraftModpack", 1, *ExportName, *PackVersion, BuildConfig.PackAuthor, tempFiles, "overrides"}
 	// test below
 	addonsJson, _ := json.Marshal(manifestB)
-	ioutil.WriteFile("output.json", addonsJson, 0644)
+	ioutil.WriteFile("./tmp/manifest.json", addonsJson, 0644)
+	RecursiveZip("./tmp", "./Test.zip")
 }

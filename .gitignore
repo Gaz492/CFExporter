@@ -28,3 +28,7 @@ _testmain.go
 tests/
 
 \.build\.json
+
+tmp/
+
+*.zip
