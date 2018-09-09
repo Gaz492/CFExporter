@@ -190,9 +190,7 @@ func RecursiveZip(pathToZip, destinationPath string) error {
 			return err
 		}
 
-		//fmt.Println(strings.TrimPrefix(filePath, filepath.Base(pathToZip)))
-
-		relPath := strings.TrimPrefix(filePath, filepath.Base(pathToZip)+"\\")
+		relPath := strings.TrimPrefix(filepath.ToSlash(filePath), filepath.Base(pathToZip)+"/")
 		zipFile, err := myZip.Create(relPath)
 		if err != nil {
 			return err
