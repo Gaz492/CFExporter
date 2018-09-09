@@ -41,6 +41,7 @@ func readMCDIR(dirPath string) {
 }
 
 func listMods(modsFolder string) {
+	var jarFingerprints []int
 	files, err := ioutil.ReadDir(path.Join(modsFolder, "mods"))
 	if err != nil {
 		log.Fatal(err)
@@ -49,8 +50,9 @@ func listMods(modsFolder string) {
 		if filepath.Ext(f.Name()) == ".jar" {
 			//fmt.Println(path.Join(modsFolder, "mods", f.Name()))
 			//fmt.Println(GetFileHash(path.Join(modsFolder, "mods", f.Name())))
-			filehash, _ := GetFileHash(path.Join(modsFolder, "mods", f.Name()))
-			fmt.Printf("%v %v\n", filehash, f.Name())
+			fileHash, _ := GetFileHash(path.Join(modsFolder, "mods", f.Name()))
+			jarFingerprints = append(jarFingerprints, fileHash)
+			fmt.Printf("%v %v\n", jarFingerprints, f.Name())
 		}
 	}
 }
