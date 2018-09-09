@@ -14,12 +14,12 @@ type buildJson struct {
 type manifestBase struct {
 	Minecraft manifestMinecraft `json:"minecraft"`
 	ManifestType string `json:"manifestType"`
-	ManifestVersion string `json:"manifestVersion"`
+	ManifestVersion int `json:"manifestVersion"`
 	Name string `json:"name"`
 	Version string `json:"version"`
 	Author string `json:"author"`
-	Files []maifestFiles `json:"files"`
-	overrides string `json:"overrides"`
+	Files []manifestFiles `json:"files"`
+	Overrides string `json:"overrides"`
 }
 
 type manifestMinecraft struct {
@@ -32,7 +32,7 @@ type manifestMinecraftModLoaders struct {
 	Primary bool `json:"primary"`
 }
 
-type maifestFiles struct {
+type manifestFiles struct {
 	ProjectID int `json:"projectID"`
 	FileID int `json:"fileID"`
 	Required bool `json:"required"`
@@ -54,7 +54,7 @@ type fingerprintResponse struct {
 type fingerprintExactMatches struct {
 	Id int `json:"id"`
 	File fingerprintFile `json:"file"`
-	LatestFiles []fingerprintFile `json:"latestFiles"`
+	//LatestFiles []fingerprintFile `json:"latestFiles"`
 }
 
 type fingerprintFile struct {
@@ -71,7 +71,7 @@ type fingerprintFile struct {
 	IsAvailable bool `json:"isAvailable"`
 	Modules []fileModules `json:"modules"`
 	PackageFingerprint int `json:"packageFingerprint"`
-	GameVersion []int `json:"gameVersion"`
+	GameVersion []string `json:"gameVersion"`
 }
 
 type fileModules struct {
