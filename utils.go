@@ -24,6 +24,7 @@ func readBuildJson(buildJsonDir string) {
 	fmt.Println(buildCfg.ForgeVersion)
 }
 
+// Credit goes to modmuss https://github.com/modmuss50/CAV2/blob/master/murmur.go
 func GetByteArrayHash(bytes []byte) int {
 	return int(murmur.MurmurHash2(computeNormalizedArray(bytes), 1))
 }
