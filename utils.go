@@ -1,14 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/aviddiviner/go-murmur"
 	"io/ioutil"
+	"net/http"
 	"os"
 )
 
-func readBuildJson(buildJsonDir string) {
+func readBuildJson(buildJsonDir string) (buildJson) {
 	// Open our jsonFile
 	jsonFile, err := os.Open(buildJsonDir)
 	// if we os.Open returns an error then handle it
@@ -21,7 +23,21 @@ func readBuildJson(buildJsonDir string) {
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	var buildCfg buildJson
 	json.Unmarshal(byteValue, &buildCfg)
-	fmt.Println(buildCfg.ForgeVersion)
+	return buildCfg
+}
+
+func getProjectIds(addons []int) (*fingerprintResponse, error) {
+	jsonPayload, _ := json.Marshal(addons)
+	response, err := GetHTTPResponse("POST", PROXY_API+"fingerprint", jsonPayload)
+	if err != nil {
+		return nil, err
+	}
+	var addonResponse *fingerprintResponse
+	err = json.NewDecoder(response.Body).Decode(&addonResponse)
+	if err != nil {
+		return nil, err
+	}
+	return addonResponse, nil
 }
 
 // Credit goes to modmuss https://github.com/modmuss50/CAV2/blob/master/murmur.go
@@ -50,4 +66,17 @@ func computeNormalizedArray(bytes []byte) []byte {
 
 func isWhitespaceCharacter(b byte) bool {
 	return b == 9 || b == 10 || b == 13 || b == 32
+}
+
+func GetHTTPResponse(method, url string, b []byte) (*http.Response, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("authToken", *ProxyAuthToken)
+	req.Header.Add("Content-Type", "application/json")
+	return client.Do(req)
+
 }
