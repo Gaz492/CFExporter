@@ -19,7 +19,10 @@ install:
 - go env
 
 build_script:
-- go build *.go
+- go build -o buildOutput\myapp -i .
+
+#build_script:
+#- ps: .\build.ps1
 
 artifacts:
 - path: buildOutput/myapp
