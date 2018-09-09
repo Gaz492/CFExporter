@@ -16,10 +16,8 @@ func main() {
 	//exportName := flag.String("n", "Twitch-Export", "Export Name")
 	buildConfig := flag.String("c", ".build.json", "Config file to get build variables")
 	flag.Parse()
-	//fmt.Println("Mc DIR:", *mcDirCLI)
 	//fmt.Println("Pack Ver:", *pVerCLI)
 	//fmt.Println("Export Name:", *exportName)
-	//fmt.Println("Build Config:", *buildConfig)
 
 	//fmt.Println(filepath.Abs(filepath.Dir(os.Args[0])))
 
