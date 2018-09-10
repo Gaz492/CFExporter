@@ -1,4 +1,4 @@
-package main
+package src
 
 type buildJson struct {
 	PackAuthor string `json:"packAuthor"`
