@@ -126,5 +126,8 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	addonsJson, _ := json.Marshal(manifestB)
 	ioutil.WriteFile("./tmp/manifest.json", addonsJson, 0644)
 	RecursiveZip("./tmp", "./"+*ExportName+"-"+*PackVersion+".zip")
-	os.RemoveAll("./tmp")
+	rErr := os.RemoveAll("./tmp")
+	if rErr != nil {
+		fmt.Println(rErr)
+	}
 }
