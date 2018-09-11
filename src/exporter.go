@@ -71,13 +71,13 @@ func listMods(modsFolder string) {
 
 func createOverrides(missingMods []int) {
 	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
-		os.Mkdir("./tmp", 755)
+		os.Mkdir("./tmp", 0755)
 	}
 	if _, err := os.Stat("./tmp/overrides"); os.IsNotExist(err) {
-		os.Mkdir("./tmp/overrides", 755)
+		os.Mkdir("./tmp/overrides", 0755)
 	}
 	if _, err := os.Stat("./tmp/overrides/mods"); os.IsNotExist(err) {
-		os.Mkdir("./tmp/overrides/mods", 755)
+		os.Mkdir("./tmp/overrides/mods", 0755)
 	}
 
 	files, err := ioutil.ReadDir(path.Join(PackDIR, "mods"))
