@@ -63,8 +63,12 @@ func listMods(modsFolder string) {
 	}
 
 	fMatchResp, _ := getProjectIds(jarFingerprints)
-	//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
-	createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+	if fMatchResp != nil {
+		//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+	}else{
+		createOverrides(nil)
+	}
 	createExport(fMatchResp.ExactMatches)
 
 }
@@ -85,13 +89,15 @@ func createOverrides(missingMods []int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, f := range files {
-		if filepath.Ext(f.Name()) == ".jar" {
-			fileHash, _ := GetFileHash(path.Join(PackDIR, "mods", f.Name()))
-			if intInSlice(fileHash, missingMods) {
-				fmt.Println("Failed to find mod: "+f.Name()+" on CurseForge, adding to overrides")
-				modSrc := path.Join(PackDIR, "mods", f.Name())
-				CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
+	if missingMods != nil {
+		for _, f := range files {
+			if filepath.Ext(f.Name()) == ".jar" {
+				fileHash, _ := GetFileHash(path.Join(PackDIR, "mods", f.Name()))
+				if intInSlice(fileHash, missingMods) {
+					fmt.Println("Failed to find mod: "+f.Name()+" on CurseForge, adding to overrides")
+					modSrc := path.Join(PackDIR, "mods", f.Name())
+					CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
+				}
 			}
 		}
 	}
