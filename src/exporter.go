@@ -68,8 +68,8 @@ func listMods(modsFolder string) {
 		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createExport(fMatchResp.ExactMatches)
 	}else{
-		createOverrides(nil)
-		createExport(nil)
+		fmt.Println("Unable to read data exiting, contact maintainer")
+		os.Exit(1)
 	}
 
 }
@@ -128,10 +128,8 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	fmt.Println("Creating Export Zip")
 	var modloader []manifestMinecraftModLoaders
 	var tempFiles []manifestFiles
-	if projectFiles != nil {
-		for _, file := range projectFiles {
-			tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
-		}
+	for _, file := range projectFiles {
+		tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
 	}
 	modloader = append(modloader, manifestMinecraftModLoaders{"forge-" + BuildConfig.ForgeVersion, true})
 	manifestMc := manifestMinecraft{BuildConfig.MinecraftVersion, modloader}
