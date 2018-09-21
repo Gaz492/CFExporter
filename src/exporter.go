@@ -109,7 +109,7 @@ func createOverrides(missingMods []int) {
 		fmt.Println("Adding "+includes+" to overrides")
 		fToInclude := path.Join(PackDIR, includes)
 		fi, err := os.Stat(fToInclude)
-		if err == nil {
+		if err != nil {
 			continue
 		}
 		switch mode := fi.Mode(); {
