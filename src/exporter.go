@@ -66,10 +66,11 @@ func listMods(modsFolder string) {
 	if fMatchResp != nil {
 		//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+		createExport(fMatchResp.ExactMatches)
 	}else{
 		createOverrides(nil)
+		createExport(nil)
 	}
-	createExport(fMatchResp.ExactMatches)
 
 }
 
@@ -100,13 +101,15 @@ func createOverrides(missingMods []int) {
 				}
 			}
 		}
+	}else{
+		fmt.Println("Skipping Mods")
 	}
 
 	for _, includes := range BuildConfig.Includes {
 		fmt.Println("Adding "+includes+" to overrides")
 		fToInclude := path.Join(PackDIR, includes)
 		fi, err := os.Stat(fToInclude)
-		if err != nil {
+		if err == nil {
 			continue
 		}
 		switch mode := fi.Mode(); {
@@ -125,8 +128,10 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	fmt.Println("Creating Export Zip")
 	var modloader []manifestMinecraftModLoaders
 	var tempFiles []manifestFiles
-	for _, file := range projectFiles {
-		tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
+	if projectFiles != nil {
+		for _, file := range projectFiles {
+			tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
+		}
 	}
 	modloader = append(modloader, manifestMinecraftModLoaders{"forge-" + BuildConfig.ForgeVersion, true})
 	manifestMc := manifestMinecraft{BuildConfig.MinecraftVersion, modloader}
