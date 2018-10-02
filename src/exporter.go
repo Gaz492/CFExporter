@@ -96,7 +96,7 @@ func createOverrides(missingMods []int) {
 			if filepath.Ext(f.Name()) == ".jar" {
 				fileHash, _ := GetFileHash(path.Join(PackDIR, "mods", f.Name()))
 				if intInSlice(fileHash, missingMods) {
-					fmt.Println("Failed to find mod: "+strconv.Itoa(fileHash)+f.Name()+" on CurseForge, adding to overrides")
+					fmt.Println("Failed to find mod: "+strconv.Itoa(fileHash)+" "+f.Name()+" on CurseForge, adding to overrides")
 					modSrc := path.Join(PackDIR, "mods", f.Name())
 					CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
 				}
