@@ -27,8 +27,13 @@ func main() {
 	PackVersion = flag.String("p", "1.0.0", "Pack Version (e.g 1.0.0)")
 	ExportName = flag.String("n", "Twitch-Export", "Export Name")
 	buildConfig := flag.String("c", ".build.json", "Config file to get build variables")
-	ProxyAuthToken = flag.String("pt", "changeme", "Authentication token used to authenticate with Gaz's Twitch Proxy")
+	ProxyAuthToken = flag.String("pt", "", "Authentication token used to authenticate with Gaz's Twitch Proxy")
 	flag.Parse()
+
+	if *ProxyAuthToken == "" {
+		fmt.Println("Please enter a proxy token using -pt <toke>")
+		os.Exit(1)
+	}
 
 	BuildConfig = readBuildJson(*buildConfig)
 	PackDIR = *mcDirCLI
