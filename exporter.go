@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	PROXY_API      = "https://curse.gaz492.uk/api/"
+	ApiUrl         string
 	ProxyAuthToken *string
+	CurseAuthToken *string
 	PackVersion    *string
 	ExportName     *string
 	BuildConfig    buildJson
@@ -27,12 +28,21 @@ func main() {
 	PackVersion = flag.String("p", "1.0.0", "Pack Version (e.g 1.0.0)")
 	ExportName = flag.String("n", "Twitch-Export", "Export Name")
 	buildConfig := flag.String("c", ".build.json", "Config file to get build variables")
-	ProxyAuthToken = flag.String("pt", "", "Authentication token used to authenticate with Gaz's Twitch Proxy")
+	ProxyAuthToken = flag.String("pt", "", "Proxy authentication token used to authenticate with Gaz's Twitch Proxy")
+	CurseAuthToken = flag.String("ct", "", "Curse authentication token used to authenticate with the Curseforge/twitch API")
 	flag.Parse()
 
-	if *ProxyAuthToken == "" {
-		fmt.Println("Please enter a proxy token using -pt <toke>")
+	if *ProxyAuthToken == "" && *CurseAuthToken == "" {
+		fmt.Println("Please enter a authentication token using -pt <toke>")
 		os.Exit(1)
+	}
+
+	if *ProxyAuthToken != "" && *CurseAuthToken == "" {
+		ApiUrl = "https://curse.gaz492.uk/api/"
+		fmt.Println("Using: " + ApiUrl + " as API")
+	} else if *CurseAuthToken != "" && *ProxyAuthToken == "" {
+		ApiUrl = "https://addons-ecs.forgesvc.net"
+		fmt.Println("Using: " + ApiUrl + " as API")
 	}
 
 	BuildConfig = readBuildJson(*buildConfig)
@@ -73,7 +83,7 @@ func listMods(modsFolder string) {
 		//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createExport(fMatchResp.ExactMatches)
-	}else{
+	} else {
 		fmt.Println("Unable to read data exiting, contact maintainer")
 		os.Exit(1)
 	}
@@ -101,18 +111,18 @@ func createOverrides(missingMods []int) {
 			if filepath.Ext(f.Name()) == ".jar" {
 				fileHash, _ := GetFileHash(path.Join(PackDIR, "mods", f.Name()))
 				if intInSlice(fileHash, missingMods) {
-					fmt.Println("Failed to find mod: "+strconv.Itoa(fileHash)+" "+f.Name()+" on CurseForge, adding to overrides")
+					fmt.Println("Failed to find mod: " + strconv.Itoa(fileHash) + " " + f.Name() + " on CurseForge, adding to overrides")
 					modSrc := path.Join(PackDIR, "mods", f.Name())
 					CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
 				}
 			}
 		}
-	}else{
+	} else {
 		fmt.Println("Skipping Mods")
 	}
 
 	for _, includes := range BuildConfig.Includes {
-		fmt.Println("Adding "+includes+" to overrides")
+		fmt.Println("Adding " + includes + " to overrides")
 		fToInclude := path.Join(PackDIR, includes)
 		fi, err := os.Stat(fToInclude)
 		if err != nil {
@@ -121,7 +131,7 @@ func createOverrides(missingMods []int) {
 		switch mode := fi.Mode(); {
 		case mode.IsDir():
 			// do directory stuff
-		CopyDir(fToInclude, "./tmp/overrides/"+includes)
+			CopyDir(fToInclude, "./tmp/overrides/"+includes)
 		case mode.IsRegular():
 			// do file stuff
 			CopyFile(fToInclude, "./tmp/overrides/"+includes)
@@ -144,7 +154,7 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	addonsJson, _ := json.Marshal(manifestB)
 	ioutil.WriteFile("./tmp/manifest.json", addonsJson, 0644)
 	RecursiveZip("./tmp", "./"+*ExportName+"-"+*PackVersion+".zip")
-	fmt.Println("Created zip: "+*ExportName+"-"+*PackVersion+".zip")
+	fmt.Println("Created zip: " + *ExportName + "-" + *PackVersion + ".zip")
 	fmt.Println("Cleaning Up")
 	rErr := os.RemoveAll("./tmp")
 	if rErr != nil {

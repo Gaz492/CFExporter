@@ -173,7 +173,7 @@ func RemoveContents(dir string) error {
 
 func getProjectIds(addons []int) (*fingerprintResponse, error) {
 	jsonPayload, _ := json.Marshal(addons)
-	response, err := GetHTTPResponse("POST", PROXY_API+"fingerprint", jsonPayload)
+	response, err := GetHTTPResponse("POST", ApiUrl+"fingerprint", jsonPayload)
 	if err != nil {
 		return nil, err
 	}
