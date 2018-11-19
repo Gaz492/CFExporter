@@ -40,11 +40,11 @@ func main() {
 	if *ProxyAuthToken != "" && *CurseAuthToken == "" {
 		ApiUrl = "https://curse.gaz492.uk/api/"
 		fmt.Println("Using: " + ApiUrl + " as API")
-		fmt.Println(ProxyAuthToken)
+		fmt.Println(*ProxyAuthToken)
 	} else if *CurseAuthToken != "" && *ProxyAuthToken == "" {
 		ApiUrl = "https://addons-ecs.forgesvc.net"
 		fmt.Println("Using: " + ApiUrl + " as API")
-		fmt.Println(CurseAuthToken)
+		fmt.Println(*CurseAuthToken)
 	}
 
 	BuildConfig = readBuildJson(*buildConfig)
