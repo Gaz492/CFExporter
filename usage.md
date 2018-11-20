@@ -11,7 +11,7 @@ You can use the following template for the `.build.json`
     "packAuthor": "FTB",
     "minecraftVersion": "1.12.2",
     "forgeVersion": "14.23.4.2756",
-    "includes": ["config", "options.txt", "map", "resources", "options.txt"]
+    "includes": ["config", "options.txt", "map", "resources"]
 }
 ```
 
