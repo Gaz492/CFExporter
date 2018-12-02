@@ -10,7 +10,8 @@ You can use the following template for the `.build.json`
 {
     "packAuthor": "FTB",
     "minecraftVersion": "1.12.2",
-    "forgeVersion": "14.23.4.2756",
+    "modLoader": "forge",
+    "modLoaderVersion": "14.23.4.2756",
     "includes": ["config", "options.txt", "map", "resources"]
 }
 ```
@@ -19,7 +20,8 @@ You can use the following template for the `.build.json`
 | ------ | ---- | ----- |
 | `packAuthor` | `String` | Sets the author of the pack |
 | `minecraftVersion` | `String` | Sets the minecraft version to use |
-| `forgeVersion` | `String` | Defines the forge version to use |
+| `modLoader` | `string` | Defines what mod loader to use
+| `modLoaderVersion` | `String` | Defines the mod loader version to use |
 | `includes` | `String Array` | Array defining the files/folders to include in the export |
 
 ---
