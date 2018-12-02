@@ -3,8 +3,9 @@ package main
 type buildJson struct {
 	PackAuthor string `json:"packAuthor"`
 	MinecraftVersion string `json:"minecraftVersion"`
-	ForgeVersion string `json:"forgeVersion"`
-	ModsFolder string `json:"modsFolder"`
+	ModLoader string `json:"modLoader"`
+	ModLoaderVersion string `json:"modLoaderVersion"`
+	//ModsFolder string `json:"modsFolder"`
 	Includes []string `json:"includes"`
 }
 
@@ -77,4 +78,4 @@ type fingerprintFile struct {
 type fileModules struct {
 	FolderName string `json:"folderName"`
 	Fingerprint int `json:"fimgerprint"`
-} 
+}

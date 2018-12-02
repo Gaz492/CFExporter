@@ -46,6 +46,19 @@ func main() {
 	}
 
 	BuildConfig = readBuildJson(*buildConfig)
+	if BuildConfig.PackAuthor == "" {
+		fmt.Println("Invalid .build.json, Author not specified")
+		os.Exit(1)
+	} else if BuildConfig.MinecraftVersion == "" {
+		fmt.Println("Invalid .build.json, Minecraft Version not specified")
+		os.Exit(1)
+	} else if BuildConfig.ModLoader == "" {
+		fmt.Println("Invalid .build.json, Mod Loader not specified")
+		os.Exit(1)
+	} else if BuildConfig.ModLoaderVersion == "" {
+		fmt.Println("Invalid .build.json, Mod Loader Version not specified")
+		os.Exit(1)
+	}
 	PackDIR = *mcDirCLI
 	readMCDIR(*mcDirCLI)
 }
@@ -147,7 +160,8 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	for _, file := range projectFiles {
 		tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
 	}
-	modloader = append(modloader, manifestMinecraftModLoaders{"forge-" + BuildConfig.ForgeVersion, true})
+	//modloader = append(modloader, manifestMinecraftModLoaders{"forge-" + BuildConfig.ForgeVersion, true})
+	modloader = append(modloader, manifestMinecraftModLoaders{BuildConfig.ModLoader + "-" + BuildConfig.ModLoaderVersion, true})
 	manifestMc := manifestMinecraft{BuildConfig.MinecraftVersion, modloader}
 	manifestB := manifestBase{manifestMc, "minecraftModpack", 1, *ExportName, *PackVersion, BuildConfig.PackAuthor, tempFiles, "overrides"}
 	// test below
