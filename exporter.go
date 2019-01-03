@@ -70,8 +70,8 @@ func readMCDIR(dirPath string) {
 		fmt.Println(err)
 		log.Fatal(err)
 	}
-	fmt.Println(files)
 	for _, f := range files {
+		fmt.Println(f.Name())
 		if strings.ToLower(f.Name()) == "mods" {
 			listMods(dirPath)
 		}
