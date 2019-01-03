@@ -67,9 +67,10 @@ func readMCDIR(dirPath string) {
 	fmt.Println("Reading Minecraft Directory")
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
-
+	fmt.Println(files)
 	for _, f := range files {
 		if strings.ToLower(f.Name()) == "mods" {
 			listMods(dirPath)
