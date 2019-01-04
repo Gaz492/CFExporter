@@ -1,0 +1,21 @@
+<!-- Thanks to https://github.com/thiakil/CurseApi for this :D -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Twitch Oauth</title>
+    <script>
+        var openedWin;
+        window.addEventListener("message", function (ev) {
+            console.log(ev.data.redirectURI);
+            var url = new URL(ev.data.redirectURI);
+            document.body.innerText = "Your code is "+url.searchParams.get("code");
+            openedWin.close();
+        });
+        openedWin = window.open("https://api.twitch.tv/kraken/oauth2/authorize?state=81849f33-0ef2-40cf-ab26-c1a3baeca37d&response_type=code&client_id=jf3xu125ejjjt5cl4osdjci6oz6p93r&redirect_uri=https%3A%2F%2Fweb.curseapp.net%2Flaguna%2Fpassport-callback.html");
+    </script>
+</head>
+<body>
+
+</body>
+</html>
