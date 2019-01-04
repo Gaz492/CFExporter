@@ -220,7 +220,7 @@ func GetHTTPResponse(method, url string, b []byte) (*http.Response, error) {
 		return nil, err
 	}
 
-	req.Header.Add("authToken", *ProxyAuthToken)
+	//req.Header.Add("authToken", *ProxyAuthToken)
 	req.Header.Add("Content-Type", "application/json")
 	return client.Do(req)
 

@@ -15,8 +15,8 @@ import (
 
 var (
 	ApiUrl         string
-	ProxyAuthToken *string
-	CurseAuthToken *string
+	//ProxyAuthToken *string
+	//CurseAuthToken *string
 	PackVersion    *string
 	ExportName     *string
 	BuildConfig    buildJson
@@ -28,22 +28,24 @@ func main() {
 	PackVersion = flag.String("p", "1.0.0", "Pack Version (e.g 1.0.0)")
 	ExportName = flag.String("n", "Twitch-Export", "Export Name")
 	buildConfig := flag.String("c", ".build.json", "Config file to get build variables")
-	ProxyAuthToken = flag.String("pt", "", "Proxy authentication token used to authenticate with Gaz's Twitch Proxy")
-	CurseAuthToken = flag.String("ct", "", "Curse authentication token used to authenticate with the Curseforge/twitch API")
+	//ProxyAuthToken = flag.String("pt", "", "Proxy authentication token used to authenticate with Gaz's Twitch Proxy")
+	//CurseAuthToken = flag.String("ct", "", "Curse authentication token used to authenticate with the Curseforge/twitch API")
 	flag.Parse()
 
-	if *ProxyAuthToken == "" && *CurseAuthToken == "" {
-		fmt.Println("Please enter a authentication token using -pt <toke>")
-		os.Exit(1)
-	}
+	//if *ProxyAuthToken == "" && *CurseAuthToken == "" {
+	//	fmt.Println("Please enter a authentication token using -pt <toke>")
+	//	os.Exit(1)
+	//}
+	//
+	//if *ProxyAuthToken != "" && *CurseAuthToken == "" {
+	//	ApiUrl = "https://curse.gaz492.uk/api/"
+	//	fmt.Println("Using: " + ApiUrl + " as API")
+	//} else if *CurseAuthToken != "" && *ProxyAuthToken == "" {
+	//	ApiUrl = "https://addons-ecs.forgesvc.net/api/"
+	//	fmt.Println("Using: " + ApiUrl + " as API")
+	//}
 
-	if *ProxyAuthToken != "" && *CurseAuthToken == "" {
-		ApiUrl = "https://curse.gaz492.uk/api/"
-		fmt.Println("Using: " + ApiUrl + " as API")
-	} else if *CurseAuthToken != "" && *ProxyAuthToken == "" {
-		ApiUrl = "https://addons-ecs.forgesvc.net/api/"
-		fmt.Println("Using: " + ApiUrl + " as API")
-	}
+	ApiUrl = "https://addons-ecs.forgesvc.net/api/"
 
 	BuildConfig = readBuildJson(*buildConfig)
 	if BuildConfig.PackAuthor == "" {
