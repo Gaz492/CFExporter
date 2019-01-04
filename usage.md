@@ -31,7 +31,7 @@ Use the following command to run the exporter tool
 ### Windows
 Open command prompt in the same folder as `twitch_export-win.exe` and run the following command
 
-`twitch_export-win.exe -d "<path to mc instance>" -n "<export name>" -p "<pack version>" -c "<path to .build.json>" -ct "<curseAuthenticationToken>"`
+`twitch_export-win.exe -d "<path to mc instance>" -n "<export name>" -p "<pack version>" -c "<path to .build.json>"`
 
 Run `twitch_export-win.exe -h` for help
 
