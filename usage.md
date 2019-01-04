@@ -38,7 +38,7 @@ Run `twitch_export-win.exe -h` for help
 ### Mac/Linux
 Open terminal in the same folder as `twitch-export-linux` and run the following command
 
-`twitch_export-linux -d=<path to mc instance> -n=<export name> -p=<pack version> -c=<path to .build.json> -ct=<curseAuthenticationToken>`
+`twitch_export-linux -d=<path to mc instance> -n=<export name> -p=<pack version> -c=<path to .build.json>`
 
 Run `twitch_export-linux -h` for help
 
