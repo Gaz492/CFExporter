@@ -14,13 +14,12 @@ import (
 )
 
 var (
-	ApiUrl         string
-	//ProxyAuthToken *string
-	//CurseAuthToken *string
-	PackVersion    *string
-	ExportName     *string
-	BuildConfig    buildJson
-	PackDIR        string
+	ApiUrl      string
+	PackVersion *string
+	ExportName  *string
+	BuildConfig buildJson
+	PackDIR     string
+	outputDir   *string
 )
 
 func main() {
@@ -28,22 +27,8 @@ func main() {
 	PackVersion = flag.String("p", "1.0.0", "Pack Version (e.g 1.0.0)")
 	ExportName = flag.String("n", "Twitch-Export", "Export Name")
 	buildConfig := flag.String("c", ".build.json", "Config file to get build variables")
-	//ProxyAuthToken = flag.String("pt", "", "Proxy authentication token used to authenticate with Gaz's Twitch Proxy")
-	//CurseAuthToken = flag.String("ct", "", "Curse authentication token used to authenticate with the Curseforge/twitch API")
+	outputDir = flag.String("o", "./", "Sets location for output files")
 	flag.Parse()
-
-	//if *ProxyAuthToken == "" && *CurseAuthToken == "" {
-	//	fmt.Println("Please enter a authentication token using -pt <toke>")
-	//	os.Exit(1)
-	//}
-	//
-	//if *ProxyAuthToken != "" && *CurseAuthToken == "" {
-	//	ApiUrl = "https://curse.gaz492.uk/api/"
-	//	fmt.Println("Using: " + ApiUrl + " as API")
-	//} else if *CurseAuthToken != "" && *ProxyAuthToken == "" {
-	//	ApiUrl = "https://addons-ecs.forgesvc.net/api/"
-	//	fmt.Println("Using: " + ApiUrl + " as API")
-	//}
 
 	ApiUrl = "https://addons-ecs.forgesvc.net/api/"
 
@@ -109,13 +94,22 @@ func listMods(modsFolder string) {
 func createOverrides(missingMods []int) {
 	fmt.Println("Creating Overrides")
 	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
-		os.Mkdir("./tmp", 0755)
+		tmpDirErr := os.Mkdir("./tmp", 0755)
+		if tmpDirErr != nil {
+			fmt.Println(tmpDirErr)
+		}
 	}
 	if _, err := os.Stat("./tmp/overrides"); os.IsNotExist(err) {
-		os.Mkdir("./tmp/overrides", 0755)
+		overridesDirErr := os.Mkdir("./tmp/overrides", 0755)
+		if overridesDirErr != nil {
+			fmt.Println(overridesDirErr)
+		}
 	}
 	if _, err := os.Stat("./tmp/overrides/mods"); os.IsNotExist(err) {
-		os.Mkdir("./tmp/overrides/mods", 0755)
+		modsDirErr := os.Mkdir("./tmp/overrides/mods", 0755)
+		if modsDirErr != nil {
+			fmt.Println(modsDirErr)
+		}
 	}
 
 	files, err := ioutil.ReadDir(path.Join(PackDIR, "mods"))
@@ -129,7 +123,10 @@ func createOverrides(missingMods []int) {
 				if intInSlice(fileHash, missingMods) {
 					fmt.Println("Failed to find mod: " + strconv.Itoa(fileHash) + " " + f.Name() + " on CurseForge, adding to overrides")
 					modSrc := path.Join(PackDIR, "mods", f.Name())
-					CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
+					cpModErr := CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
+					if cpModErr != nil {
+						fmt.Println(cpModErr)
+					}
 				}
 			}
 		}
@@ -147,10 +144,16 @@ func createOverrides(missingMods []int) {
 		switch mode := fi.Mode(); {
 		case mode.IsDir():
 			// do directory stuff
-			CopyDir(fToInclude, "./tmp/overrides/"+includes)
+			cpDirErr := CopyDir(fToInclude, "./tmp/overrides/"+includes)
+			if cpDirErr != nil {
+				fmt.Println(cpDirErr)
+			}
 		case mode.IsRegular():
 			// do file stuff
-			CopyFile(fToInclude, "./tmp/overrides/"+includes)
+			cpFileErr := CopyFile(fToInclude, "./tmp/overrides/"+includes)
+			if cpFileErr != nil {
+				fmt.Println(cpFileErr)
+			}
 		}
 	}
 
@@ -163,14 +166,19 @@ func createExport(projectFiles []fingerprintExactMatches) {
 	for _, file := range projectFiles {
 		tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
 	}
-	//modloader = append(modloader, manifestMinecraftModLoaders{"forge-" + BuildConfig.ForgeVersion, true})
 	modloader = append(modloader, manifestMinecraftModLoaders{BuildConfig.ModLoader + "-" + BuildConfig.ModLoaderVersion, true})
 	manifestMc := manifestMinecraft{BuildConfig.MinecraftVersion, modloader}
 	manifestB := manifestBase{manifestMc, "minecraftModpack", 1, *ExportName, *PackVersion, BuildConfig.PackAuthor, tempFiles, "overrides"}
 	// test below
 	addonsJson, _ := json.Marshal(manifestB)
-	ioutil.WriteFile("./tmp/manifest.json", addonsJson, 0644)
-	RecursiveZip("./tmp", "./"+*ExportName+"-"+*PackVersion+".zip")
+	ioErr := ioutil.WriteFile("./tmp/manifest.json", addonsJson, 0644)
+	if ioErr != nil {
+		fmt.Println(ioErr)
+	}
+	zipErr := RecursiveZip("./tmp", path.Join(*outputDir, *ExportName+"-"+*PackVersion+".zip"))
+	if zipErr != nil {
+		fmt.Println(zipErr)
+	}
 	fmt.Println("Created zip: " + *ExportName + "-" + *PackVersion + ".zip")
 	fmt.Println("Cleaning Up")
 	rErr := os.RemoveAll("./tmp")
