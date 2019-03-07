@@ -4,7 +4,7 @@ workflow "Build Application" {
 }
 
 action "build" {
-  uses = "sosedoff/actions/golang-build@master"
+  uses = "gaz492/actions/golang-build@master"
   
   args = "windows/amd64 windows/386 linux/amd64 darwin/amd64"
 }
