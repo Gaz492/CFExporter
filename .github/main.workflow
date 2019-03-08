@@ -11,7 +11,7 @@ action "build" {
 action "release" {
   needs = ["build"]
   uses = "actions/aws/cli@master"
-  args = "aws --endpoint-url https://s3.gaz492.uk s3 sync .release s3://tools"
+  args = "--endpoint-url https://s3.gaz492.uk s3 sync .release s3://tools"
   // Make sure to add the secrets in the repo settings page
   // AWS_REGION is set to us-east-1 by default
   secrets = [
