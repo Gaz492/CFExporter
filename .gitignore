@@ -34,3 +34,7 @@ tmp/
 *.zip
 
 \.vs/
+
+out/
+
+test/
