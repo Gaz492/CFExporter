@@ -30,7 +30,7 @@ func main() {
 	outputDir = flag.String("o", "./", "Sets location for output files")
 	flag.Parse()
 
-	ApiUrl = "https://addons-ecs.forgesvc.net/api/v2"
+	ApiUrl = "https://addons-ecs.forgesvc.net/api/v2/"
 
 	BuildConfig = readBuildJson(*buildConfig)
 	if BuildConfig.PackAuthor == "" {
