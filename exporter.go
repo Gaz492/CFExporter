@@ -79,13 +79,17 @@ func listMods(modsFolder string) {
 		}
 	}
 
-	fMatchResp, _ := getProjectIds(jarFingerprints)
+	fMatchResp, err := getProjectIds(jarFingerprints)
 	if fMatchResp != nil {
 		//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createExport(fMatchResp.ExactMatches)
 	} else {
 		fmt.Println("Unable to read data exiting, contact maintainer")
+		if err != nil {
+			log.Fatal(err)
+
+		}
 		os.Exit(1)
 	}
 
