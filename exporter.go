@@ -80,8 +80,10 @@ func listMods(modsFolder string) {
 	}
 
 	fMatchResp, err := getProjectIds(jarFingerprints)
+	//fmt.Println(fMatchResp)
 	if fMatchResp != nil {
 		//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
+		fmt.Println(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
 		createExport(fMatchResp.ExactMatches)
 	} else {
@@ -139,24 +141,26 @@ func createOverrides(missingMods []int) {
 	}
 
 	for _, includes := range BuildConfig.Includes {
-		fmt.Println("Adding " + includes + " to overrides")
-		fToInclude := path.Join(PackDIR, includes)
-		fi, err := os.Stat(fToInclude)
-		if err != nil {
-			continue
-		}
-		switch mode := fi.Mode(); {
-		case mode.IsDir():
-			// do directory stuff
-			cpDirErr := CopyDir(fToInclude, "./tmp/overrides/"+includes)
-			if cpDirErr != nil {
-				fmt.Println(cpDirErr)
+		if includes != "mods" {
+			fmt.Println("Adding " + includes + " to overrides")
+			fToInclude := path.Join(PackDIR, includes)
+			fi, err := os.Stat(fToInclude)
+			if err != nil {
+				continue
 			}
-		case mode.IsRegular():
-			// do file stuff
-			cpFileErr := CopyFile(fToInclude, "./tmp/overrides/"+includes)
-			if cpFileErr != nil {
-				fmt.Println(cpFileErr)
+			switch mode := fi.Mode(); {
+			case mode.IsDir():
+				// do directory stuff
+				cpDirErr := CopyDir(fToInclude, "./tmp/overrides/"+includes)
+				if cpDirErr != nil {
+					fmt.Println(cpDirErr)
+				}
+			case mode.IsRegular():
+				// do file stuff
+				cpFileErr := CopyFile(fToInclude, "./tmp/overrides/"+includes)
+				if cpFileErr != nil {
+					fmt.Println(cpFileErr)
+				}
 			}
 		}
 	}
