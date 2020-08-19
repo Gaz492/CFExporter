@@ -22,7 +22,7 @@ You can use the following template for the `.build.json`
 | `minecraftVersion` | `String` | Sets the minecraft version to use |
 | `modLoader` | `string` | Defines what mod loader to use
 | `modLoaderVersion` | `String` | Defines the mod loader version to use |
-| `includes` | `String Array` | Array defining the files/folders to include in the export |
+| `includes` | `String Array` | Array defining the files/folders to include in the export, you should not add the mods folder to this |
 
 ---
 ## Step 2
