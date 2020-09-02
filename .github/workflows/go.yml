@@ -6,20 +6,19 @@ on:
   pull_request:
     branches: [ master ]
 
+# workflow tasks
 jobs:
-
-  build:
-    name: Build
+  generate:
+    name: Generate cross-platform builds
     runs-on: ubuntu-latest
     steps:
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-    
-    - name: Generate build files
-      uses: thatisuday/go-cross-build@v1
-      with:
-        platforms: 'linux/amd64, darwin/amd64, windows/amd64'
-#         package: 'demo'
-        name: 'TwitchExportCreator'
-        compress: 'true'
-        dest: 'dist'
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+      - name: Generate build files
+        uses: thatisuday/go-cross-build@v1
+        with:
+            platforms: 'linux/amd64, darwin/amd64, windows/amd64'
+            package: ''
+            name: 'TwitchExportCreator'
+            compress: 'false'
+            dest: 'dist'
