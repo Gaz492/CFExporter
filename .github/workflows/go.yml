@@ -29,10 +29,10 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
-      run: go build -v -o /tmp/dist/TwitchExportCreator-${{ runner.OS }} .
+      run: go build -v .
     
     - name: Atrifacts
       uses: actions/upload-artifact@master
       with:
         name: my-artifact
-        path: /tmp/dist/ 
+        path: ./
