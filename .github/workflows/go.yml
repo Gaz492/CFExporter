@@ -32,6 +32,7 @@ jobs:
       run: go build -v -o /tmp/dist/ .
     
     - name: Atrifacts
+      uses: actions/upload-artifact@master
       with:
         name: my-artifact
         path: /tmp/dist/ 
