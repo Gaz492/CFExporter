@@ -29,4 +29,9 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
-      run: go build -v .
+      run: go build -v -o /tmp/dist/ .
+    
+    - name: Atrifacts
+      with:
+        name: my-artifact
+        path: /tmp/dist/ 
