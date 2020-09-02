@@ -6,33 +6,24 @@ on:
   pull_request:
     branches: [ master ]
 
+# workflow tasks
 jobs:
-  build:
-    name: Build
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+  generate:
+    name: Generate cross-platform builds
+    runs-on: ubuntu-latest
     steps:
-
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.13
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-
-    - name: Build
-      run: go build -v .
-    
-    - name: Atrifacts
-      uses: actions/upload-artifact@master
-      with:
-        name: my-artifact
-        path: ./
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+      - name: Generate build files
+        uses: thatisuday/go-cross-build@v1
+        with:
+            platforms: 'linux/amd64, darwin/amd64, windows/amd64'
+            package: 'main'
+            name: 'program'
+            compress: 'true'
+            dest: 'dist'
+      - name: Atrifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: my-artifact
+          path: dist
