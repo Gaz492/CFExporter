@@ -121,32 +121,39 @@ func RecursiveZip(pathToZip, destinationPath string) error {
 	myZip := zip.NewWriter(destinationFile)
 	err = filepath.Walk(pathToZip, func(filePath string, info os.FileInfo, err error) error {
 		if info.IsDir() {
+			fmt.Println("info.IsDir is Nil")
 			return nil
 		}
 		if err != nil {
+			fmt.Println("FilePath walk error")
 			return err
 		}
 		relPath := strings.TrimPrefix(filepath.ToSlash(filePath), filepath.Base(pathToZip)+"/")
 		zipFile, err := myZip.Create(relPath)
 		if err != nil {
+			fmt.Println("Creating zip error")
 			return err
 		}
 		fsFile, err := os.Open(filePath)
 		if err != nil {
+			fmt.Println("os.Open error")
 			return err
 		}
 		defer fsFile.Close()
 		_, err = io.Copy(zipFile, fsFile)
 		if err != nil {
+			fmt.Println("io.copy error")
 			return err
 		}
 		return nil
 	})
 	if err != nil {
+		fmt.Println("File path walk error ln151")
 		return err
 	}
 	err = myZip.Close()
 	if err != nil {
+		fmt.Println("Close zip error")
 		return err
 	}
 	return nil
