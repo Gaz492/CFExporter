@@ -24,8 +24,8 @@ body:
     attributes:
       label: Debug Code
       description: |
-        "Please run the following tool and provide the code given."
-        "https://dist.creeper.host/tools/ftb-debug/ftb-debug.exe"
+        Please run the following tool and provide the code given.
+        https://dist.creeper.host/tools/ftb-debug/ftb-debug.exe
       placeholder: FTB-DBGTEVOISQIRA
     validations:
       required: true
