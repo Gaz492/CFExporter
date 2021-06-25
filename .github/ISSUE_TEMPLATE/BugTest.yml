@@ -13,6 +13,15 @@ body:
       placeholder: ex. 202103260308-5fe58412e0-prototyping
     validations:
       required: false
+  - type: input
+    id: uiversion
+    attributes:
+      label: UI Version
+      description: |
+        You can find the UI version at the bottom of the settings page in the app
+      placeholder: ex. 4b4de71d
+    validations:
+      required: false
   - type: textarea
     id: logs
     attributes:
@@ -31,6 +40,15 @@ body:
       placeholder: FTB-DBGTEVOISQIRA
     validations:
       required: true
+  - type: input
+    id: bugdesc
+    attributes:
+      label: Describe the bug
+      description: |
+        A clear and concise description of what the bug is
+      placeholder: FTB-DBGTEVOISQIRA
+    validations:
+      required: true
   - type: textarea
     id: reproduce
     attributes:
@@ -43,6 +61,21 @@ body:
         4. See error
     validations:
       required: true
+  - type: input
+    id: expectedBehaviour
+    attributes:
+      label: Expected behaviour
+      description: |
+        A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+    validations:
+      required: false
   - type: textarea
     id: additional
     attributes:
