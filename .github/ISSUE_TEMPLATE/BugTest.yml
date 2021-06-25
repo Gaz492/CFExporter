@@ -3,6 +3,20 @@ description: Report an issue with the Windows version of the FTB App
 title: "[Windows][Bug]: "
 labels: [bug, os/windows]
 body:
+  - type: dropdown
+    id: os
+    attributes:
+      label: What Operating System
+      multiple: false
+      options:
+        - Windows 10
+        - Windows 8.1
+        - Windows 7
+        - MacOS (Latest)
+        - MacOS (Old)
+        - Linux (Debian)
+        - Linux (Arch)
+        - Linux (Other)
   - type: input
     id: appversion
     attributes:
