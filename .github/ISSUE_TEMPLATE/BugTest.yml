@@ -20,7 +20,7 @@ body:
     validations:
       required: false
   - type: input
-    id: logs
+    id: debugcode
     attributes:
       label: Debug Code
       description: |
