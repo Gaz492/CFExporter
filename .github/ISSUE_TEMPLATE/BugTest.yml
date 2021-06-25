@@ -1,60 +1,58 @@
-name: Bug Report
-description: File a bug report
-title: "[Bug]: "
-labels: [bug]
+name: Bug Report Windows
+description: Report an issue with the Windows version of the FTB App
+title: "[Windows][Bug]: "
+labels: [bug, os/windows]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to fill out this bug report!
   - type: input
-    id: contact
+    id: appversion
     attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
+      label: App Version
+      description: "What version of the app are you having issues with?"
+      placeholder: ex. 202103260308-5fe58412e0-prototyping
     validations:
       required: false
   - type: textarea
-    id: what-happened
+    id: logs
     attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
+      label: Log Files
+      description: "Link(s) to any log files that may help debug your issue"
+      placeholder: https://pste.ch/dotedubine
+    validations:
+      required: false
+  - type: input
+    id: logs
+    attributes:
+      label: Debug Code
+      description: |
+        "Please run the following tool and provide the code given."
+        "https://dist.creeper.host/tools/ftb-debug/ftb-debug.exe"
+      placeholder: FTB-DBGTEVOISQIRA
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Tell us how we can reproduce the issue
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. Scroll down to ...
+        4. See error
       value: "A bug happened!"
     validations:
       required: true
-  - type: dropdown
-    id: version
-    attributes:
-      label: Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-    validations:
-      required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
   - type: textarea
-    id: logs
+    id: additional
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
+      label: Additional information
+      description: Add any other context about the problem here
+    validations:
+      required: false
   - type: checkboxes
     id: terms
     attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
+      label: Information
       options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: I have provided as much information as possible
           required: true
