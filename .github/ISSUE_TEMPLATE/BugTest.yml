@@ -5,11 +5,11 @@ labels: [bug]
 body:
   - type: dropdown
     id: os
+    validations:
+        required: true
     attributes:
       label: What Operating System
       multiple: false
-      validations:
-        required: true
       options:
         - Windows 10
         - Windows 8.1
