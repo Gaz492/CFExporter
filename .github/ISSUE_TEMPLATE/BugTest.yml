@@ -8,6 +8,8 @@ body:
     attributes:
       label: What Operating System
       multiple: false
+      validations:
+        required: true
       options:
         - Windows 10
         - Windows 8.1
