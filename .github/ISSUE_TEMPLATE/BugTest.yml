@@ -7,7 +7,9 @@ body:
     id: appversion
     attributes:
       label: App Version
-      description: "What version of the app are you having issues with?"
+      description: |
+        "What version of the app are you having issues with?"
+        You can find the app version at the bottom of the settings page in the app
       placeholder: ex. 202103260308-5fe58412e0-prototyping
     validations:
       required: false
