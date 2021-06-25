@@ -46,7 +46,6 @@ body:
       label: Describe the bug
       description: |
         A clear and concise description of what the bug is
-      placeholder: FTB-DBGTEVOISQIRA
     validations:
       required: true
   - type: textarea
