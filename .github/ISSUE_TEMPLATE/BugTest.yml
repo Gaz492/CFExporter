@@ -36,7 +36,7 @@ body:
       label: Debug Code
       description: |
         Please run the following tool and provide the code given.
-        https://dist.creeper.host/tools/ftb-debug/ftb-debug.exe
+        [Windows](https://dist.creeper.host/tools/ftb-debug/ftb-debug.exe) [MacOS](https://dist.creeper.host/tools/ftb-debug/ftb-debug-macos) [Linux](https://dist.creeper.host/tools/ftb-debug/ftb-debug-linux)
       placeholder: FTB-DBGTEVOISQIRA
     validations:
       required: true
