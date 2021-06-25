@@ -1,7 +1,7 @@
-name: Bug Report Windows
+name: Bug Report
 description: Report an issue with the Windows version of the FTB App
-title: "[Windows][Bug]: "
-labels: [bug, os/windows]
+title: "[Bug]: "
+labels: [bug]
 body:
   - type: dropdown
     id: os
@@ -12,8 +12,10 @@ body:
         - Windows 10
         - Windows 8.1
         - Windows 7
+        - Windows Insider Preview
         - MacOS (Latest)
         - MacOS (Old)
+        - MacOS (Beta)
         - Linux (Debian)
         - Linux (Arch)
         - Linux (Other)
