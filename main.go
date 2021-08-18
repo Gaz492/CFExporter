@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/pterm/pterm"
@@ -63,7 +64,9 @@ func init() {
 
 func main() {
 	instanceFiles := readMCDIR()
-	prepareExport(instanceFiles)
+	matchedModsRaw := prepareExport(instanceFiles)
+	createOverrides(Difference(matchedModsRaw.InstalledFingerprints, matchedModsRaw.ExactFingerprints))
+	createExport(matchedModsRaw.ExactMatches)
 }
 
 func readMCDIR() (files []fs.FileInfo) {
@@ -84,9 +87,8 @@ func readMCDIR() (files []fs.FileInfo) {
 	return files
 }
 
-func prepareExport(instanceFiles []fs.FileInfo) {
+func prepareExport(instanceFiles []fs.FileInfo) (matchedModsRaw *fingerprintResponse) {
 	pterm.DefaultSection.Println("Preparing export")
-	var matchedModsRaw *fingerprintResponse
 
 	peSpinner, _ := pterm.DefaultSpinner.Start("Scanning for includes")
 	for _, include := range BuildConfig.Includes {
@@ -104,9 +106,8 @@ func prepareExport(instanceFiles []fs.FileInfo) {
 	peSpinner.Success()
 	if fsContains(instanceFiles,"mods") && contains(BuildConfig.Includes, "mods") && matchedModsRaw != nil {
 		pterm.Debug.Println("Following hashes were not matched:", Difference(matchedModsRaw.InstalledFingerprints, matchedModsRaw.ExactFingerprints))
-		//createOverrides(Difference(matchedModsRaw.InstalledFingerprints, matchedModsRaw.ExactFingerprints))
-		//createExport(fMatchResp.ExactMatches)
 	}
+	return
 }
 
 func scanMods(modsDir string) *fingerprintResponse{
@@ -137,4 +138,101 @@ func scanMods(modsDir string) *fingerprintResponse{
 		pterm.Error.Println("Error with fetching mod project:", err)
 	}
 	return fMatchResp
+}
+
+func createOverrides(missingMods []int) {
+	pterm.DefaultSection.Println("Creating Overrides")
+	if _, err := os.Stat("./tmp"); os.IsNotExist(err) {
+		tmpDirErr := os.Mkdir("./tmp", 0755)
+		if tmpDirErr != nil {
+			pterm.Error.Println(tmpDirErr)
+		}
+	}
+	if _, err := os.Stat("./tmp/overrides"); os.IsNotExist(err) {
+		overridesDirErr := os.Mkdir("./tmp/overrides", 0755)
+		if overridesDirErr != nil {
+			pterm.Error.Println(overridesDirErr)
+		}
+	}
+	if _, err := os.Stat("./tmp/overrides/mods"); os.IsNotExist(err) {
+		modsDirErr := os.Mkdir("./tmp/overrides/mods", 0755)
+		if modsDirErr != nil {
+			pterm.Error.Println(modsDirErr)
+		}
+	}
+
+	files, err := ioutil.ReadDir(path.Join(*mcDir, "mods"))
+	if err != nil {
+		pterm.Fatal.Println(err)
+	}
+	if missingMods != nil {
+		for _, f := range files {
+			if filepath.Ext(f.Name()) == ".jar" {
+				fileHash, _ := GetFileHash(path.Join(*mcDir, "mods", f.Name()))
+				if intInSlice(fileHash, missingMods) {
+					pterm.Info.Println("Failed to find mod: " + strconv.Itoa(fileHash) + " " + f.Name() + " on CurseForge, adding to overrides")
+					modSrc := path.Join(*mcDir, "mods", f.Name())
+					cpModErr := CopyFile(modSrc, "./tmp/overrides/mods/"+f.Name())
+					if cpModErr != nil {
+						pterm.Error.Println(cpModErr)
+					}
+				}
+			}
+		}
+	} else {
+		pterm.Info.Println("No mods to override")
+	}
+
+	for _, includes := range BuildConfig.Includes {
+		if includes != "mods" {
+			pterm.Info.Println("Adding " + includes + " to overrides")
+			fToInclude := path.Join(*mcDir, includes)
+			fi, err := os.Stat(fToInclude)
+			if err != nil {
+				continue
+			}
+			switch mode := fi.Mode(); {
+			case mode.IsDir():
+				// do directory stuff
+				cpDirErr := CopyDir(fToInclude, "./tmp/overrides/"+includes)
+				if cpDirErr != nil {
+					pterm.Error.Println(cpDirErr)
+				}
+			case mode.IsRegular():
+				// do file stuff
+				cpFileErr := CopyFile(fToInclude, "./tmp/overrides/"+includes)
+				if cpFileErr != nil {
+					pterm.Error.Println(cpFileErr)
+				}
+			}
+		}
+	}
+}
+
+func createExport(projectFiles []fingerprintExactMatches) {
+	pterm.DefaultSection.Println("Creating Export Zip")
+	var modloader []manifestMinecraftModLoaders
+	var tempFiles []manifestFiles
+	for _, file := range projectFiles {
+		tempFiles = append(tempFiles, manifestFiles{file.Id, file.File.Id, true})
+	}
+	modloader = append(modloader, manifestMinecraftModLoaders{BuildConfig.ModLoader + "-" + BuildConfig.ModLoaderVersion, true})
+	manifestMc := manifestMinecraft{BuildConfig.MinecraftVersion, modloader}
+	manifestB := manifestBase{manifestMc, "minecraftModpack", 1, *exportName, *exportVersion, BuildConfig.PackAuthor, tempFiles, "overrides"}
+	// test below
+	addonsJson, _ := json.Marshal(manifestB)
+	ioErr := ioutil.WriteFile("./tmp/manifest.json", addonsJson, 0644)
+	if ioErr != nil {
+		pterm.Error.Println(ioErr)
+	}
+	zipErr := RecursiveZip("./tmp", path.Join(*outputDir, *exportName+"-"+*exportVersion+".zip"))
+	if zipErr != nil {
+		pterm.Error.Println(zipErr)
+	}
+	pterm.Info.Println("Created zip: " + *exportName + "-" + *exportVersion + ".zip")
+	pterm.Info.Println("Cleaning Up")
+	rErr := os.RemoveAll("./tmp")
+	if rErr != nil {
+		pterm.Error.Println(rErr)
+	}
 }

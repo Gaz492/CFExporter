@@ -158,7 +158,7 @@ func RecursiveZip(pathToZip, destinationPath string) error {
 	myZip := zip.NewWriter(destinationFile)
 	err = filepath.Walk(pathToZip, func(filePath string, info os.FileInfo, err error) error {
 		if info.IsDir() {
-			pterm.Debug.Println("info.IsDir is Nil")
+			//pterm.Debug.Println("info.IsDir is Nil")
 			return nil
 		}
 		if err != nil {
