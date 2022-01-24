@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-func readBuildJson(buildJsonDir string) (buildJson) {
+func readBuildJson(buildJsonDir string) buildJson {
 	// Open our jsonFile
 	jsonFile, err := os.Open(buildJsonDir)
 	// if we os.Open returns an error then handle it
@@ -181,6 +181,7 @@ func RemoveContents(dir string) error {
 func getProjectIds(addons []int) (*fingerprintResponse, error) {
 	jsonPayload, _ := json.Marshal(addons)
 	response, err := GetHTTPResponse("POST", ApiUrl+"fingerprint", jsonPayload)
+	defer response.Body.Close()
 	if err != nil {
 		return nil, err
 	}
