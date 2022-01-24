@@ -83,9 +83,9 @@ func listMods(modsFolder string) {
 	//fmt.Println(fMatchResp)
 	if fMatchResp != nil {
 		//fmt.Printf("Unable to find %v", Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
-		fmt.Println(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
-		createOverrides(Difference(fMatchResp.InstalledFingerprints, fMatchResp.ExactFingerprints))
-		createExport(fMatchResp.ExactMatches)
+		fmt.Println(Difference(fMatchResp.Data.InstalledFingerprints, fMatchResp.Data.ExactFingerprints))
+		createOverrides(Difference(fMatchResp.Data.InstalledFingerprints, fMatchResp.Data.ExactFingerprints))
+		createExport(fMatchResp.Data.ExactMatches)
 	} else {
 		fmt.Println("Unable to read data exiting, contact maintainer")
 		if err != nil {
