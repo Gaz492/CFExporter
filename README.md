@@ -1,7 +1,7 @@
-CurseforgeExporter
+CFExporter
 
 # Usage Guide
-
+Not affiliated with Overwolf or CurseForge.com
 ## Step 1
 You will need to create a config file named `.build.json`.
 This file contains the settings and values that will be used to create the export.
