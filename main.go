@@ -160,7 +160,7 @@ func scanFiles(folders []string) {
 }
 
 func genOverrides(missingFiles []int64, folder string) {
-	pterm.DefaultSection.Println("Generating overrides...")
+	pterm.DefaultSection.Println("Generating overrides for " + folder + "...")
 
 	if _, err := os.Stat(path.Join(tmpDir, "overrides")); os.IsNotExist(err) {
 		err := os.Mkdir(path.Join(tmpDir, "overrides"), os.ModePerm)
@@ -187,7 +187,7 @@ func genOverrides(missingFiles []int64, folder string) {
 			fileHash, _ := GetFileHash(path.Join(*instanceDir, folder, file.Name()))
 			if intInSlice(fileHash, missingFiles) {
 				fileProgress.UpdateTitle("Found: " + file.Name())
-				pterm.Info.Println(fmt.Sprintf("Failed to find file %s on CurseForge - generating override", file.Name()))
+				pterm.Debug.Println(fmt.Sprintf("Failed to find file %s on CurseForge - generating override", file.Name()))
 				modSrc := path.Join(*instanceDir, folder, file.Name())
 				err = CopyFile(modSrc, path.Join(tmpDir, "overrides", folder, file.Name()))
 				if err != nil {
