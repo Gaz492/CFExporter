@@ -48,7 +48,7 @@ Open command prompt in the same folder as `CFExporter.exe` and run the following
 
 `CFExporter.exe -d "<path to mc instance>" -c "<path to .build.json>"`
 
-Run `twitch_export-win.exe -help` for help
+Run `CFExporter.exe -help` for help
 
 ### Mac/Linux
 Open terminal in the same folder as `CFExporter` and run the following command
