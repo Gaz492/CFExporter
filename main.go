@@ -186,7 +186,7 @@ func genOverrides(missingFiles []int64, folder string) {
 		for _, file := range files {
 			fileHash, _ := GetFileHash(path.Join(*instanceDir, folder, file.Name()))
 			if intInSlice(fileHash, missingFiles) {
-				fileProgress.UpdateTitle("Found: " + file.Name())
+				fileProgress.UpdateTitle("Adding to overrides: " + file.Name())
 				pterm.Debug.Println(fmt.Sprintf("Failed to find file %s on CurseForge - generating override", file.Name()))
 				modSrc := path.Join(*instanceDir, folder, file.Name())
 				err = CopyFile(modSrc, path.Join(tmpDir, "overrides", folder, file.Name()))
