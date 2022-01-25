@@ -57,10 +57,6 @@ Open terminal in the same folder as `CFExporter` and run the following command
 
 Run `CFExporter -h` for help
 
-### Curse Auth token
-To get a curse authentication token you will need to send a post request to https://logins-v1.curseapp.net/login with the body of a Curse email and password. See https://logins-v1.curseapp.net/help for help
-
-
 ---
 # Issues
 
