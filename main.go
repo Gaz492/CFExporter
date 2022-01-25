@@ -30,13 +30,6 @@ var (
 )
 
 func init() {
-	logo, _ := pterm.DefaultBigText.WithLetters(
-		pterm.NewLettersFromStringWithStyle("CF", pterm.NewStyle(pterm.FgYellow)),
-		pterm.NewLettersFromStringWithStyle("Exporter", pterm.NewStyle(pterm.FgGray)),
-	).Srender()
-	pterm.DefaultCenter.Println(logo) // Print BigLetters with the default CenterPrinter
-	pterm.DefaultCenter.WithCenterEachLineSeparately().Println(fmt.Sprintf("Version: %s", appVersion))
-	pterm.DefaultSection.Println("Initializing...")
 	instanceDir = flag.String("d", "./", "Path to Minecraft instance")
 	outputDir = flag.String("o", "./out", "Location to output export zip")
 	configPath = flag.String("c", "./.build.json", "Path to .build.json")
@@ -65,9 +58,18 @@ func init() {
 		pterm.Debug.Println("Debug mode enabled")
 	}
 	if *silent {
-		pterm.Info.Println("Silent mode enabled")
+		pterm.Debug.Println("Silent mode enabled")
 		pterm.DisableOutput()
 	}
+
+	logo, _ := pterm.DefaultBigText.WithLetters(
+		pterm.NewLettersFromStringWithStyle("CF", pterm.NewStyle(pterm.FgYellow)),
+		pterm.NewLettersFromStringWithStyle("Exporter", pterm.NewStyle(pterm.FgGray)),
+	).Srender()
+	pterm.DefaultCenter.Println(logo) // Print BigLetters with the default CenterPrinter
+	pterm.DefaultCenter.WithCenterEachLineSeparately().Println(fmt.Sprintf("Version: %s", appVersion))
+
+	pterm.DefaultSection.Println("Initializing...")
 
 	buildConfig = readBuildJson(*configPath)
 
