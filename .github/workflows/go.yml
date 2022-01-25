@@ -26,4 +26,5 @@ jobs:
           goversion: 1.17
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
+          binary_name: "CurseForgeExporter-${{github.ref_name}}"
           pre_command: "sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
