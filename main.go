@@ -253,6 +253,12 @@ func genExport(projectFiles []FingerprintExactMatches) {
 		pterm.Error.Println("Failed to write manifest:", err)
 		os.Exit(1)
 	}
+	if _, err := os.Stat(*outputDir); os.IsNotExist(err) {
+		err := os.Mkdir(*outputDir, os.ModePerm)
+		if err != nil {
+			pterm.Error.Println("Failed to create output directory:", err)
+		}
+	}
 	err = RecursiveZip(tmpDir, path.Join(*outputDir, *exportName+"-"+*exportVersion+".zip"))
 	if err != nil {
 		pterm.Error.Println("Failed to zip export:", err)
