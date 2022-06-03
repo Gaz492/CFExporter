@@ -6,3 +6,5 @@ out/
 test/
 
 *.exe
+
+.DS_Store
