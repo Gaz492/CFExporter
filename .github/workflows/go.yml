@@ -28,3 +28,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           binary_name: "CFExporter"
           pre_command: "sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
+          build_flags: "-extldflags=-static"
