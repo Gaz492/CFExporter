@@ -6,7 +6,7 @@ on:
 
 jobs:
   release-linux-amd64:
-    name: release linux/amd64
+    name: Build and release
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,7 +20,7 @@ jobs:
             goos: windows
     steps:
       - uses: actions/checkout@v2
-      - uses: wangyoucao577/go-release-action@v1.22
+      - uses: wangyoucao577/go-release-action@v1.28
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goversion: 1.17
@@ -28,4 +28,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           binary_name: "CFExporter"
           pre_command: "sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
-          build_flags: "-extldflags=-static"
+          ldflags: "-extldflags=-static"
