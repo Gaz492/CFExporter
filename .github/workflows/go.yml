@@ -5,7 +5,7 @@ on:
     types: [created]
 
 jobs:
-  release-linux-amd64:
+  release:
     name: Build and release
     runs-on: ubuntu-latest
     strategy:
@@ -16,8 +16,6 @@ jobs:
         exclude:
           - goarch: "386"
             goos: darwin
-          - goarch: arm64
-            goos: windows
     steps:
       - uses: actions/checkout@v2
       - uses: wangyoucao577/go-release-action@v1.28
