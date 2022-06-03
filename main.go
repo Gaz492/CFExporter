@@ -170,6 +170,7 @@ func genOverrides(missingFiles []int64, folder string) {
 	}
 
 	if len(missingFiles) > 0 {
+		pterm.Debug.Println("Adding missing files to overrides:", missingFiles)
 		if _, err := os.Stat(path.Join(tmpDir, "overrides", folder)); os.IsNotExist(err) {
 			err := os.Mkdir(path.Join(tmpDir, "overrides", folder), os.ModePerm)
 			if err != nil {
@@ -203,7 +204,7 @@ func genOverrides(missingFiles []int64, folder string) {
 func extraIncludes() {
 	includeProgress, _ := pterm.DefaultProgressbar.WithTotal(len(buildConfig.Includes)).WithTitle("Adding extra includes to overrides").Start()
 	for _, include := range buildConfig.Includes {
-		if include != "mods" || include != "resourcepacks" {
+		if include != "mods" && include != "resourcepacks" {
 			includeProgress.UpdateTitle("Adding: " + include + " to overrides")
 			fToInclude := path.Join(*instanceDir, include)
 			fi, err := os.Stat(fToInclude)
@@ -225,6 +226,8 @@ func extraIncludes() {
 					pterm.Error.Println("Failed to copy file:", err)
 				}
 			}
+		} else {
+			pterm.Debug.Println("Skipping", include)
 		}
 		includeProgress.Increment()
 	}
