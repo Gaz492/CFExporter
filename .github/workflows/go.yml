@@ -25,5 +25,5 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           binary_name: "CFExporter"
-          pre_command: "sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
+          pre_command: "export CGO_ENABLED=0 && sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
           ldflags: "-extldflags=-static"
