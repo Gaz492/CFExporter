@@ -5,8 +5,8 @@ on:
     types: [created]
 
 jobs:
-  release-linux-amd64:
-    name: release linux/amd64
+  release:
+    name: Build and release
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,15 +16,14 @@ jobs:
         exclude:
           - goarch: "386"
             goos: darwin
-          - goarch: arm64
-            goos: windows
     steps:
       - uses: actions/checkout@v2
-      - uses: wangyoucao577/go-release-action@v1.22
+      - uses: wangyoucao577/go-release-action@v1.28
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goversion: 1.17
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           binary_name: "CFExporter"
-          pre_command: "sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
+          pre_command: "export CGO_ENABLED=0 && sed -i 's/${VERSION}/${{github.ref_name}}/g' main.go"
+          ldflags: "-extldflags=-static"
