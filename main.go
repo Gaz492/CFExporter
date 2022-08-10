@@ -128,6 +128,7 @@ func readInstanceDir() {
 
 func scanFiles(folders []string) {
 	var fMatchResp *FingerprintResponse
+	var exactMatches []FingerprintExactMatches
 	for _, folder := range folders {
 		var fingerprints []int64
 		pterm.Info.Println("Scanning " + folder + " directory...")
@@ -154,9 +155,10 @@ func scanFiles(folders []string) {
 			pterm.Error.Println("Failed to get project IDs:", err)
 			os.Exit(1)
 		}
+		exactMatches = append(exactMatches, fMatchResp.Data.ExactMatches...)
 	}
 	extraIncludes()
-	genExport(fMatchResp.Data.ExactMatches)
+	genExport(exactMatches)
 }
 
 func genOverrides(missingFiles []int64, folder string) {
@@ -245,7 +247,7 @@ func genExport(projectFiles []FingerprintExactMatches) {
 	modLoader = append(modLoader, ModLoaders{buildConfig.ModLoader + "-" + buildConfig.ModLoaderVersion, true})
 	minecraft := Minecraft{buildConfig.MinecraftVersion, modLoader}
 	manifest := ExportManifest{minecraft, "minecraftModpack", 1, *exportName, *exportVersion, buildConfig.PackAuthor, tempFiles, "overrides"}
-	manifestJson, err := json.Marshal(manifest)
+	manifestJson, err := json.MarshalIndent(manifest, "", "  ")
 	if err != nil {
 		pterm.Error.Println("Failed to marshal manifest:", err)
 		os.Exit(1)
