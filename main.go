@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/pterm/pterm"
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -132,7 +132,7 @@ func scanFiles(folders []string) {
 	for _, folder := range folders {
 		var fingerprints []int64
 		pterm.Info.Println("Scanning " + folder + " directory...")
-		files, err := os.ReadDir(path.Join(*instanceDir, folder))
+		files, err := os.ReadDir(filepath.Join(*instanceDir, folder))
 		if err != nil {
 			pterm.Error.Println("Failed to read "+folder+" directory\n", err)
 			os.Exit(1)
@@ -141,7 +141,7 @@ func scanFiles(folders []string) {
 		fileProgress, _ := pterm.DefaultProgressbar.WithTotal(len(files)).WithTitle("Reading " + folder + " directory").Start()
 		for _, file := range files {
 			fileProgress.UpdateTitle("Found: " + file.Name())
-			fileHash, _ := GetFileHash(path.Join(*instanceDir, folder, file.Name()))
+			fileHash, _ := GetFileHash(filepath.Join(*instanceDir, folder, file.Name()))
 			fingerprints = append(fingerprints, fileHash)
 			fileProgress.Increment()
 		}
@@ -164,8 +164,8 @@ func scanFiles(folders []string) {
 func genOverrides(missingFiles []int64, folder string) {
 	pterm.DefaultSection.Println("Generating overrides for " + folder + "...")
 
-	if _, err := os.Stat(path.Join(tmpDir, "overrides")); os.IsNotExist(err) {
-		err := os.Mkdir(path.Join(tmpDir, "overrides"), os.ModePerm)
+	if _, err := os.Stat(filepath.Join(tmpDir, "overrides")); os.IsNotExist(err) {
+		err := os.Mkdir(filepath.Join(tmpDir, "overrides"), os.ModePerm)
 		if err != nil {
 			pterm.Error.Println("Failed to create overrides directory:", err)
 		}
@@ -173,26 +173,26 @@ func genOverrides(missingFiles []int64, folder string) {
 
 	if len(missingFiles) > 0 {
 		pterm.Debug.Println("Adding missing files to overrides:", missingFiles)
-		if _, err := os.Stat(path.Join(tmpDir, "overrides", folder)); os.IsNotExist(err) {
-			err := os.Mkdir(path.Join(tmpDir, "overrides", folder), os.ModePerm)
+		if _, err := os.Stat(filepath.Join(tmpDir, "overrides", folder)); os.IsNotExist(err) {
+			err := os.Mkdir(filepath.Join(tmpDir, "overrides", folder), os.ModePerm)
 			if err != nil {
 				pterm.Error.Println(fmt.Sprintf("Failed to create overrides/%s directory:", folder), err)
 			}
 		}
 
-		files, err := os.ReadDir(path.Join(*instanceDir, folder))
+		files, err := os.ReadDir(filepath.Join(*instanceDir, folder))
 		if err != nil {
 			pterm.Error.Println("Failed to read "+folder+" directory\n", err)
 			os.Exit(1)
 		}
 		fileProgress, _ := pterm.DefaultProgressbar.WithTotal(len(files)).WithTitle("Reading " + folder + " directory for overrides").Start()
 		for _, file := range files {
-			fileHash, _ := GetFileHash(path.Join(*instanceDir, folder, file.Name()))
+			fileHash, _ := GetFileHash(filepath.Join(*instanceDir, folder, file.Name()))
 			if intInSlice(fileHash, missingFiles) {
 				fileProgress.UpdateTitle("Adding to overrides: " + file.Name())
 				pterm.Debug.Println(fmt.Sprintf("Failed to find file %s on CurseForge - generating override", file.Name()))
-				modSrc := path.Join(*instanceDir, folder, file.Name())
-				err = CopyFile(modSrc, path.Join(tmpDir, "overrides", folder, file.Name()))
+				modSrc := filepath.Join(*instanceDir, folder, file.Name())
+				err = CopyFile(modSrc, filepath.Join(tmpDir, "overrides", folder, file.Name()))
 				if err != nil {
 					pterm.Error.Println("Failed to copy file:", err)
 				}
@@ -208,7 +208,7 @@ func extraIncludes() {
 	for _, include := range buildConfig.Includes {
 		if include != "mods" && include != "resourcepacks" {
 			includeProgress.UpdateTitle("Adding: " + include + " to overrides")
-			fToInclude := path.Join(*instanceDir, include)
+			fToInclude := filepath.Join(*instanceDir, include)
 			fi, err := os.Stat(fToInclude)
 			if err != nil {
 				includeProgress.UpdateTitle("Skipping adding: " + include + " to overrides")
@@ -216,14 +216,14 @@ func extraIncludes() {
 				includeProgress.Increment()
 				continue
 			}
-			switch mode := fi.Mode(); {
-			case mode.IsDir():
-				err = CopyDir(fToInclude, path.Join(tmpDir, "overrides", include))
+
+			if fi.IsDir() {
+				err = CopyDir(fToInclude, filepath.Join(tmpDir, "overrides", include))
 				if err != nil {
 					pterm.Error.Println("Failed to copy directory:", err)
 				}
-			case mode.IsRegular():
-				err = CopyFile(fToInclude, path.Join(tmpDir, "overrides", include))
+			} else {
+				err = CopyFile(fToInclude, filepath.Join(tmpDir, "overrides", include))
 				if err != nil {
 					pterm.Error.Println("Failed to copy file:", err)
 				}
@@ -255,7 +255,7 @@ func genExport(projectFiles []FingerprintExactMatches) {
 		pterm.Error.Println("Failed to marshal manifest:", err)
 		os.Exit(1)
 	}
-	err = os.WriteFile(path.Join(tmpDir, "manifest.json"), manifestJson, 0644)
+	err = os.WriteFile(filepath.Join(tmpDir, "manifest.json"), manifestJson, 0644)
 	if err != nil {
 		pterm.Error.Println("Failed to write manifest:", err)
 		os.Exit(1)
@@ -266,7 +266,7 @@ func genExport(projectFiles []FingerprintExactMatches) {
 			pterm.Error.Println("Failed to create output directory:", err)
 		}
 	}
-	err = RecursiveZip(tmpDir, path.Join(*outputDir, *exportName+"-"+*exportVersion+".zip"))
+	err = RecursiveZip(tmpDir, filepath.Join(*outputDir, *exportName+"-"+*exportVersion+".zip"))
 	if err != nil {
 		pterm.Error.Println("Failed to zip export:", err)
 		os.Exit(1)
