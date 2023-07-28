@@ -50,6 +50,13 @@ func CopyFile(src, dst string) error {
 	var dstfd *os.File
 	var srcinfo os.FileInfo
 
+	parentDir := filepath.Dir(dst)
+	if _, err := os.Stat(parentDir); os.IsNotExist(err) {
+		err := os.MkdirAll(parentDir, os.ModePerm)
+		if err != nil {
+			pterm.Error.Println("Failed to create temp copy directory:", err)
+		}
+	}
 	if srcfd, err = os.Open(src); err != nil {
 		return err
 	}
